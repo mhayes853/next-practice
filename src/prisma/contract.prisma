@@ -1,0 +1,25 @@
+// use prisma-8
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  username  String?
+  name      String?
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+}
+
+type TranscriptPart {
+  timestamp Float
+  content String
+}
+
+model Transcript {
+  id Int @id @default(autoincrement())
+  name String
+  parts TranscriptPart[]
+  model String
+  filename String
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+}
