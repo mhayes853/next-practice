@@ -3,10 +3,10 @@
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
-  username  String?
   name      String?
   createdAt TimestamptzString @default(now())
   updatedAt temporal.updatedAtString()
+  transcripts Transcript[]
 }
 
 type TranscriptPart {
@@ -22,4 +22,6 @@ model Transcript {
   filename String
   createdAt TimestamptzString @default(now())
   updatedAt temporal.updatedAtString()
+  user User @relation(fields: [userId], references: [id])
+  userId Int
 }
