@@ -11,6 +11,11 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
+  // callbacks: {
+  //   signIn: async ({ user }) => {
+  //     return true
+  //   }
+  // }
 };
 
 export default NextAuth(authOptions);
