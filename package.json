@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@prisma/orm-postgres": "^8.0.0-rc.18",
+    "ai": "^7.0.148",
     "dotenv": "^18.0.8",
     "next": "16.4.2",
     "next-auth": "4",

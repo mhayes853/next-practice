@@ -25,6 +25,7 @@ model TranscriptPart {
   id Int @id @default(autoincrement())
   content String
   timestamp Float
+  durationMillis Float
   transcript Transcript @relation(fields: [transcriptId], references: [id])
   transcriptId Int
 }

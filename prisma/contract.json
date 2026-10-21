@@ -143,6 +143,13 @@
                   "kind": "scalar"
                 }
               },
+              "durationMillis": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/float8@1",
+                  "kind": "scalar"
+                }
+              },
               "id": {
                 "nullable": false,
                 "type": {
@@ -187,6 +194,9 @@
               "fields": {
                 "content": {
                   "column": "content"
+                },
+                "durationMillis": {
+                  "column": "durationMillis"
                 },
                 "id": {
                   "column": "id"
@@ -379,6 +389,11 @@
                   "dataType": "pg/text",
                   "nullable": false
                 },
+                "durationMillis": {
+                  "codecId": "pg/float8@1",
+                  "dataType": "pg/float8",
+                  "nullable": false
+                },
                 "id": {
                   "codecId": "pg/int4@1",
                   "dataType": "pg/int4",
@@ -494,7 +509,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "de16d260b8aa7694f02b0f7be3eacf8d1a62d64848880d9313df2dbe4f452c97"
+    "storageHash": "219ed35023ffd723d8b172a6a4b414e5ecfc16eb7facf71fe73521d526d62e6e"
   },
   "execution": {
     "executionHash": "8f762a4a7cb0bd2c4fccc4d465d0a02bf46e02a5ef70ffc0d1ea4ebaf4960311",

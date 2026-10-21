@@ -18,7 +18,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'de16d260b8aa7694f02b0f7be3eacf8d1a62d64848880d9313df2dbe4f452c97'>;
+  StorageHashBase<'219ed35023ffd723d8b172a6a4b414e5ecfc16eb7facf71fe73521d526d62e6e'>;
 export type ExecutionHash =
   ExecutionHashBase<'8f762a4a7cb0bd2c4fccc4d465d0a02bf46e02a5ef70ffc0d1ea4ebaf4960311'>;
 export type ProfileHash =
@@ -245,6 +245,7 @@ export type FieldOutputTypes = {
     };
     readonly TranscriptPart: {
       readonly content: CodecTypes['pg/text@1']['output'];
+      readonly durationMillis: CodecTypes['pg/float8@1']['output'];
       readonly id: CodecTypes['pg/int4@1']['output'];
       readonly timestamp: CodecTypes['pg/float8@1']['output'];
       readonly transcriptId: CodecTypes['pg/int4@1']['output'];
@@ -271,6 +272,7 @@ export type FieldInputTypes = {
     };
     readonly TranscriptPart: {
       readonly content: CodecTypes['pg/text@1']['input'];
+      readonly durationMillis: CodecTypes['pg/float8@1']['input'];
       readonly id: CodecTypes['pg/int4@1']['input'];
       readonly timestamp: CodecTypes['pg/float8@1']['input'];
       readonly transcriptId: CodecTypes['pg/int4@1']['input'];
@@ -297,6 +299,7 @@ export type StorageColumnTypes = {
     };
     readonly TranscriptPart: {
       readonly content: CodecTypes['pg/text@1']['output'];
+      readonly durationMillis: CodecTypes['pg/float8@1']['output'];
       readonly id: CodecTypes['pg/int4@1']['output'];
       readonly timestamp: CodecTypes['pg/float8@1']['output'];
       readonly transcriptId: CodecTypes['pg/int4@1']['output'];
@@ -323,6 +326,7 @@ export type StorageColumnInputTypes = {
     };
     readonly TranscriptPart: {
       readonly content: CodecTypes['pg/text@1']['input'];
+      readonly durationMillis: CodecTypes['pg/float8@1']['input'];
       readonly id: CodecTypes['pg/int4@1']['input'];
       readonly timestamp: CodecTypes['pg/float8@1']['input'];
       readonly transcriptId: CodecTypes['pg/int4@1']['input'];
@@ -352,6 +356,7 @@ export namespace Models {
   };
   export type public_TranscriptPart = {
     content: CodecTypes['pg/text@1']['output'];
+    durationMillis: CodecTypes['pg/float8@1']['output'];
     id: CodecTypes['pg/int4@1']['output'];
     timestamp: CodecTypes['pg/float8@1']['output'];
     transcriptId: CodecTypes['pg/int4@1']['output'];
@@ -475,6 +480,12 @@ type ContractBase = Omit<
                 readonly content: {
                   readonly dataType: 'pg/text';
                   readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly durationMillis: {
+                  readonly dataType: 'pg/float8';
+                  readonly codecId: 'pg/float8@1';
                   readonly nullable: false;
                   readonly many: false;
                 };
@@ -673,6 +684,10 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
+              readonly durationMillis: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/float8@1' };
+              };
               readonly id: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
@@ -705,6 +720,7 @@ type ContractBase = Omit<
               readonly namespaceId: 'public';
               readonly fields: {
                 readonly content: { readonly column: 'content' };
+                readonly durationMillis: { readonly column: 'durationMillis' };
                 readonly id: { readonly column: 'id' };
                 readonly timestamp: { readonly column: 'timestamp' };
                 readonly transcriptId: { readonly column: 'transcriptId' };
