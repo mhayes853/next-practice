@@ -1,4 +1,5 @@
 import { createUserIfNotExists } from "@/lib/user";
+import { db } from "@/prisma/db";
 import NextAuth, { type NextAuthOptions } from "next-auth";
 import GitHubProvider from "next-auth/providers/github";
 
@@ -14,9 +15,11 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     signIn: async ({ user }) => {
-      if (!user.name || !user.email) return false
-      await createUserIfNotExists(user.name, user.email)
-      return true
+      return await db.transaction(async (tx) => {
+        if (!user.name || !user.email) return false
+        await createUserIfNotExists(tx, user.name, user.email)
+        return true
+      })
     }
   }
 };
