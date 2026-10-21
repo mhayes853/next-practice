@@ -8,4 +8,4 @@ export const db = postgres<Contract>({
   url: process.env['DATABASE_URL']!,
 });
 
-export type DatabaseConnection = Pick<typeof db, "orm">
+export type DatabaseConnection = Pick<typeof db, "orm" | "sql">
