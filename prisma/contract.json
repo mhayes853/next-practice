@@ -8,6 +8,10 @@
       "model": "Transcript",
       "namespace": "public"
     },
+    "TranscriptPart": {
+      "model": "TranscriptPart",
+      "namespace": "public"
+    },
     "User": {
       "model": "User",
       "namespace": "public"
@@ -54,16 +58,6 @@
                   "kind": "scalar"
                 }
               },
-              "parts": {
-                "many": {
-                  "elementNullable": false
-                },
-                "nullable": false,
-                "type": {
-                  "kind": "valueObject",
-                  "name": "TranscriptPart"
-                }
-              },
               "updatedAt": {
                 "nullable": false,
                 "type": {
@@ -80,6 +74,21 @@
               }
             },
             "relations": {
+              "parts": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "transcriptId"
+                  ]
+                },
+                "to": {
+                  "model": "TranscriptPart",
+                  "namespace": "public"
+                }
+              },
               "user": {
                 "cardinality": "N:1",
                 "nullable": false,
@@ -114,9 +123,6 @@
                 "name": {
                   "column": "name"
                 },
-                "parts": {
-                  "column": "parts"
-                },
                 "updatedAt": {
                   "column": "updatedAt"
                 },
@@ -126,6 +132,74 @@
               },
               "namespaceId": "public",
               "table": "Transcript"
+            }
+          },
+          "TranscriptPart": {
+            "fields": {
+              "content": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "timestamp": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/float8@1",
+                  "kind": "scalar"
+                }
+              },
+              "transcriptId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "transcript": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "transcriptId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Transcript",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "content": {
+                  "column": "content"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "timestamp": {
+                  "column": "timestamp"
+                },
+                "transcriptId": {
+                  "column": "transcriptId"
+                }
+              },
+              "namespaceId": "public",
+              "table": "TranscriptPart"
             }
           },
           "User": {
@@ -205,26 +279,6 @@
               "table": "User"
             }
           }
-        },
-        "valueObjects": {
-          "TranscriptPart": {
-            "fields": {
-              "content": {
-                "nullable": false,
-                "type": {
-                  "codecId": "pg/text@1",
-                  "kind": "scalar"
-                }
-              },
-              "timestamp": {
-                "nullable": false,
-                "type": {
-                  "codecId": "pg/float8@1",
-                  "kind": "scalar"
-                }
-              }
-            }
-          }
         }
       }
     }
@@ -269,11 +323,6 @@
                   "dataType": "pg/text",
                   "nullable": false
                 },
-                "parts": {
-                  "codecId": "pg/jsonb@1",
-                  "dataType": "pg/jsonb",
-                  "nullable": false
-                },
                 "updatedAt": {
                   "codecId": "pg/timestamptz-string@1",
                   "dataType": "pg/timestamptz",
@@ -313,6 +362,71 @@
                   ],
                   "name": "Transcript_userId_idx_a489d58a",
                   "prefix": "Transcript_userId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
+            "TranscriptPart": {
+              "columns": {
+                "content": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/int4@1",
+                  "dataType": "pg/int4",
+                  "default": {
+                    "expression": "autoincrement()",
+                    "kind": "function"
+                  },
+                  "nullable": false
+                },
+                "timestamp": {
+                  "codecId": "pg/float8@1",
+                  "dataType": "pg/float8",
+                  "nullable": false
+                },
+                "transcriptId": {
+                  "codecId": "pg/int4@1",
+                  "dataType": "pg/int4",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "index": {
+                    "name": "TranscriptPart_transcriptId_idx_bdef8e7f"
+                  },
+                  "source": {
+                    "columns": [
+                      "transcriptId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "TranscriptPart"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "Transcript"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "transcriptId"
+                  ],
+                  "name": "TranscriptPart_transcriptId_idx_bdef8e7f",
+                  "prefix": "TranscriptPart_transcriptId_idx",
                   "unique": false
                 }
               ],
@@ -380,7 +494,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "00d5b5ac643f92725ac7c3eda64a7bb954008ee059a137651b507d59a479d17e"
+    "storageHash": "de16d260b8aa7694f02b0f7be3eacf8d1a62d64848880d9313df2dbe4f452c97"
   },
   "execution": {
     "executionHash": "8f762a4a7cb0bd2c4fccc4d465d0a02bf46e02a5ef70ffc0d1ea4ebaf4960311",
