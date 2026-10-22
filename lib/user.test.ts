@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
-import { createUserIfNotExists } from "./user";
-import { db } from "@/prisma/db";
+import { describe, expect, it } from "vitest"
+import { createUserIfNotExists } from "./user"
+import { db } from "@/prisma/db"
 
 describe("user tests", () => {
   it("should return a user after saving", async () => {

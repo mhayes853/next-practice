@@ -1,4 +1,4 @@
-import { transcribe } from "ai";
+import { transcribe } from "ai"
 
 const TRANSCRIPTION_MODELS = {
   whisper1: {
@@ -24,8 +24,8 @@ export type TranscriptionSegment = {
 }
 
 export type Transcription = {
-  model: TranscriptionModelID,
-  segments: TranscriptionSegment[],
+  model: TranscriptionModelID
+  segments: TranscriptionSegment[]
   language?: string
   audioDurationMillis: number
 }
@@ -37,15 +37,14 @@ export async function transcribeBlob(
   const result = await transcribe({
     model: TRANSCRIPTION_MODELS[model].tag,
     audio: await blob.bytes()
-  });
+  })
   return {
     model,
-    segments: result.segments
-      .map((s) => ({
-        content: s.text,
-        timestamp: s.startSecond * 1000,
-        durationMillis: (s.endSecond - s.startSecond) * 1000
-      })),
+    segments: result.segments.map((s) => ({
+      content: s.text,
+      timestamp: s.startSecond * 1000,
+      durationMillis: (s.endSecond - s.startSecond) * 1000
+    })),
     language: result.language,
     audioDurationMillis: (result.durationInSeconds ?? 0) * 1000
   }
