@@ -3,6 +3,8 @@
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
+  emailVerified TimestamptzJsDate?
+  providerId String?
   name      String?
   createdAt TimestamptzString @default(now())
   updatedAt temporal.updatedAtString()

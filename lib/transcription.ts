@@ -17,6 +17,8 @@ export function displayName(model: TranscriptionModelID) {
   return TRANSCRIPTION_MODELS[model].displayName
 }
 
+export type TranscriptionID = number & { _tag: "transcript" }
+
 export type TranscriptionSegment = {
   content: string
   timestamp: number
