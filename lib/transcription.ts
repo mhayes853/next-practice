@@ -1,6 +1,4 @@
-import { transcribe } from "ai"
-
-const TRANSCRIPTION_MODELS = {
+export const TRANSCRIPTION_MODELS = {
   whisper1: {
     tag: "openai/whisper1",
     displayName: "Whisper 1 (OpenAI)"
@@ -12,10 +10,6 @@ const TRANSCRIPTION_MODELS = {
 } as const
 
 export type TranscriptionModelID = keyof typeof TRANSCRIPTION_MODELS
-
-export function displayName(model: TranscriptionModelID) {
-  return TRANSCRIPTION_MODELS[model].displayName
-}
 
 export type TranscriptionID = number & { _tag: "transcript" }
 
@@ -30,24 +24,4 @@ export type Transcription = {
   segments: TranscriptionSegment[]
   language?: string
   audioDurationMillis: number
-}
-
-export async function transcribeBlob(
-  blob: Blob,
-  model: TranscriptionModelID
-): Promise<Transcription> {
-  const result = await transcribe({
-    model: TRANSCRIPTION_MODELS[model].tag,
-    audio: await blob.bytes()
-  })
-  return {
-    model,
-    segments: result.segments.map((s) => ({
-      content: s.text,
-      timestamp: s.startSecond * 1000,
-      durationMillis: (s.endSecond - s.startSecond) * 1000
-    })),
-    language: result.language,
-    audioDurationMillis: (result.durationInSeconds ?? 0) * 1000
-  }
 }
