@@ -3,7 +3,7 @@ import {
   TranscriptionModelID,
   Transcription,
   TRANSCRIPTION_MODELS
-} from "./transcription"
+} from "../transcription"
 
 export async function transcribeBlob(
   blob: Blob,

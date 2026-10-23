@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 import { authAdapter } from "./auth"
 import { db } from "@/prisma/db"
-import { userId } from "./user"
+import { userId } from "../user"
 
 const TEST_USER = {
   name: "Blob",

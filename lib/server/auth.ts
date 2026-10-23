@@ -3,7 +3,7 @@ import { NextAuthOptions } from "next-auth"
 import { Adapter, AdapterAccount, AdapterUser } from "next-auth/adapters"
 import GitHubProvider from "next-auth/providers/github"
 import { Models } from "@/prisma/contract"
-import { userId } from "./user"
+import { userId } from "../user"
 
 export const authAdapter = {
   createUser: async (user: Omit<AdapterUser, "id">) => {
