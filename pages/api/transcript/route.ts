@@ -1,5 +1,5 @@
+import { authenticatedHandler } from "@/lib/server/auth"
 import { TranscriptionID, Transcription } from "@/lib/transcription"
-import { NextApiRequest, NextApiResponse } from "next"
 
 export const config = {
   api: {
@@ -17,7 +17,4 @@ export type TranscriptionResponse = {
   }
 }
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {}
+export default authenticatedHandler(async (req, res, session) => {})

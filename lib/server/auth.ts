@@ -1,9 +1,11 @@
 import { db } from "@/prisma/db"
-import { NextAuthOptions } from "next-auth"
+import { getServerSession, NextAuthOptions, Session } from "next-auth"
 import { Adapter, AdapterAccount, AdapterUser } from "next-auth/adapters"
 import GitHubProvider from "next-auth/providers/github"
 import { Models } from "@/prisma/contract"
 import { userId } from "../user"
+import { NextApiRequest, NextApiResponse } from "next"
+import type { DefaultSession } from "next-auth"
 
 export const authAdapter = {
   createUser: async (user: Omit<AdapterUser, "id">) => {
@@ -87,6 +89,20 @@ function authUser(
   return !user ? null : { ...user, id: user.id.toString(), image: null }
 }
 
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string
+    } & DefaultSession["user"]
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    userId: string
+  }
+}
+
 export const authOptions: NextAuthOptions = {
   adapter: authAdapter,
   providers: [
@@ -97,5 +113,31 @@ export const authOptions: NextAuthOptions = {
   ],
   session: {
     strategy: "jwt"
+  },
+  callbacks: {
+    jwt: async ({ token, user }) => {
+      if (user) {
+        token.userId = user.id
+      }
+      return token
+    },
+    session: async ({ token, session }) => {
+      session.user.id = token.userId
+      return session
+    }
+  }
+}
+
+export function authenticatedHandler<TData>(
+  handler: (
+    req: NextApiRequest,
+    res: NextApiResponse<TData>,
+    session: Session
+  ) => Promise<void>
+) {
+  return async (req: NextApiRequest, res: NextApiResponse) => {
+    const session = await getServerSession(req, res, authOptions)
+    if (!session) return res.status(401).json({ error: "unauthorized" })
+    await handler(req, res, session)
   }
 }
