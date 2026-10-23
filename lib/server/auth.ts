@@ -3,7 +3,7 @@ import { getServerSession, NextAuthOptions, Session } from "next-auth"
 import { Adapter, AdapterAccount, AdapterUser } from "next-auth/adapters"
 import GitHubProvider from "next-auth/providers/github"
 import { Models } from "@/prisma/contract"
-import { userId } from "../user"
+import { UserID, userId } from "../user"
 import { NextApiRequest, NextApiResponse } from "next"
 import type { DefaultSession } from "next-auth"
 
@@ -92,14 +92,14 @@ function authUser(
 declare module "next-auth" {
   interface Session {
     user: {
-      id: string
+      id: UserID
     } & DefaultSession["user"]
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
-    userId: string
+    userId: UserID
   }
 }
 
@@ -116,7 +116,7 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     jwt: async ({ token, user }) => {
-      token.userId = user.id
+      if (user) token.userId = userId(user.id)
       return token
     },
     session: async ({ token, session }) => {

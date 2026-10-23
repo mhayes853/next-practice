@@ -18,7 +18,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'76691e30b4abacb2acba0fb37c9731a5f5fd7aaadcbc692ff4fd828852053d98'>;
+  StorageHashBase<'241ad9d3240c24b7f4f5cd661d4cfa08ecc270e8fe50a7f07e576f2e866b66af'>;
 export type ExecutionHash =
   ExecutionHashBase<'8f762a4a7cb0bd2c4fccc4d465d0a02bf46e02a5ef70ffc0d1ea4ebaf4960311'>;
 export type ProfileHash =
@@ -235,11 +235,12 @@ type DefaultLiteralValue<CodecId extends string, Encoded> = CodecId extends keyo
 export type FieldOutputTypes = {
   readonly public: {
     readonly Transcript: {
+      readonly audioDurationMillis: CodecTypes['pg/float8@1']['output'];
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
       readonly filename: CodecTypes['pg/text@1']['output'];
       readonly id: CodecTypes['pg/int4@1']['output'];
+      readonly language: CodecTypes['pg/text@1']['output'] | null;
       readonly model: CodecTypes['pg/text@1']['output'];
-      readonly name: CodecTypes['pg/text@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
       readonly userId: CodecTypes['pg/int4@1']['output'];
     };
@@ -264,11 +265,12 @@ export type FieldOutputTypes = {
 export type FieldInputTypes = {
   readonly public: {
     readonly Transcript: {
+      readonly audioDurationMillis: CodecTypes['pg/float8@1']['input'];
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
       readonly filename: CodecTypes['pg/text@1']['input'];
       readonly id: CodecTypes['pg/int4@1']['input'];
+      readonly language: CodecTypes['pg/text@1']['input'] | null;
       readonly model: CodecTypes['pg/text@1']['input'];
-      readonly name: CodecTypes['pg/text@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
       readonly userId: CodecTypes['pg/int4@1']['input'];
     };
@@ -293,11 +295,12 @@ export type FieldInputTypes = {
 export type StorageColumnTypes = {
   readonly public: {
     readonly Transcript: {
+      readonly audioDurationMillis: CodecTypes['pg/float8@1']['output'];
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
       readonly filename: CodecTypes['pg/text@1']['output'];
       readonly id: CodecTypes['pg/int4@1']['output'];
+      readonly language: CodecTypes['pg/text@1']['output'] | null;
       readonly model: CodecTypes['pg/text@1']['output'];
-      readonly name: CodecTypes['pg/text@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
       readonly userId: CodecTypes['pg/int4@1']['output'];
     };
@@ -322,11 +325,12 @@ export type StorageColumnTypes = {
 export type StorageColumnInputTypes = {
   readonly public: {
     readonly Transcript: {
+      readonly audioDurationMillis: CodecTypes['pg/float8@1']['input'];
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
       readonly filename: CodecTypes['pg/text@1']['input'];
       readonly id: CodecTypes['pg/int4@1']['input'];
+      readonly language: CodecTypes['pg/text@1']['input'] | null;
       readonly model: CodecTypes['pg/text@1']['input'];
-      readonly name: CodecTypes['pg/text@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-string@1']['input'];
       readonly userId: CodecTypes['pg/int4@1']['input'];
     };
@@ -351,11 +355,12 @@ export type StorageColumnInputTypes = {
 
 export namespace Models {
   export type public_Transcript = {
+    audioDurationMillis: CodecTypes['pg/float8@1']['output'];
     createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
     filename: CodecTypes['pg/text@1']['output'];
     id: CodecTypes['pg/int4@1']['output'];
+    language: CodecTypes['pg/text@1']['output'] | null;
     model: CodecTypes['pg/text@1']['output'];
-    name: CodecTypes['pg/text@1']['output'];
     updatedAt: CodecTypes['pg/timestamptz-string@1']['output'];
     userId: CodecTypes['pg/int4@1']['output'];
     parts: public_TranscriptPart[];
@@ -412,6 +417,12 @@ type ContractBase = Omit<
           readonly table: {
             readonly Transcript: {
               columns: {
+                readonly audioDurationMillis: {
+                  readonly dataType: 'pg/float8';
+                  readonly codecId: 'pg/float8@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
                 readonly createdAt: {
                   readonly dataType: 'pg/timestamptz';
                   readonly codecId: 'pg/timestamptz-string@1';
@@ -435,13 +446,13 @@ type ContractBase = Omit<
                   };
                   readonly many: false;
                 };
-                readonly model: {
+                readonly language: {
                   readonly dataType: 'pg/text';
                   readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
+                  readonly nullable: true;
                   readonly many: false;
                 };
-                readonly name: {
+                readonly model: {
                   readonly dataType: 'pg/text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: false;
@@ -629,6 +640,10 @@ type ContractBase = Omit<
         readonly models: {
           readonly Transcript: {
             readonly fields: {
+              readonly audioDurationMillis: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/float8@1' };
+              };
               readonly createdAt: {
                 readonly nullable: false;
                 readonly type: {
@@ -644,11 +659,11 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
               };
-              readonly model: {
-                readonly nullable: false;
+              readonly language: {
+                readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
-              readonly name: {
+              readonly model: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
@@ -690,11 +705,12 @@ type ContractBase = Omit<
               readonly table: 'Transcript';
               readonly namespaceId: 'public';
               readonly fields: {
+                readonly audioDurationMillis: { readonly column: 'audioDurationMillis' };
                 readonly createdAt: { readonly column: 'createdAt' };
                 readonly filename: { readonly column: 'filename' };
                 readonly id: { readonly column: 'id' };
+                readonly language: { readonly column: 'language' };
                 readonly model: { readonly column: 'model' };
-                readonly name: { readonly column: 'name' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
                 readonly userId: { readonly column: 'userId' };
               };

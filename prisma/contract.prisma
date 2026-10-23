@@ -13,10 +13,11 @@ model User {
 
 model Transcript {
   id Int @id @default(autoincrement())
-  name String
   parts TranscriptPart[]
   model String
   filename String
+  audioDurationMillis Float
+  language String?
   createdAt TimestamptzString @default(now())
   updatedAt temporal.updatedAtString()
   user User @relation(fields: [userId], references: [id])

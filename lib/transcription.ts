@@ -20,6 +20,7 @@ export type TranscriptionSegment = {
 }
 
 export type Transcription = {
+  filename: string
   model: TranscriptionModelID
   segments: TranscriptionSegment[]
   language?: string

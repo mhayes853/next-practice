@@ -23,6 +23,13 @@
         "models": {
           "Transcript": {
             "fields": {
+              "audioDurationMillis": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/float8@1",
+                  "kind": "scalar"
+                }
+              },
               "createdAt": {
                 "nullable": false,
                 "type": {
@@ -44,14 +51,14 @@
                   "kind": "scalar"
                 }
               },
-              "model": {
-                "nullable": false,
+              "language": {
+                "nullable": true,
                 "type": {
                   "codecId": "pg/text@1",
                   "kind": "scalar"
                 }
               },
-              "name": {
+              "model": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/text@1",
@@ -108,6 +115,9 @@
             },
             "storage": {
               "fields": {
+                "audioDurationMillis": {
+                  "column": "audioDurationMillis"
+                },
                 "createdAt": {
                   "column": "createdAt"
                 },
@@ -117,11 +127,11 @@
                 "id": {
                   "column": "id"
                 },
+                "language": {
+                  "column": "language"
+                },
                 "model": {
                   "column": "model"
-                },
-                "name": {
-                  "column": "name"
                 },
                 "updatedAt": {
                   "column": "updatedAt"
@@ -320,6 +330,11 @@
           "table": {
             "Transcript": {
               "columns": {
+                "audioDurationMillis": {
+                  "codecId": "pg/float8@1",
+                  "dataType": "pg/float8",
+                  "nullable": false
+                },
                 "createdAt": {
                   "codecId": "pg/timestamptz-string@1",
                   "dataType": "pg/timestamptz",
@@ -343,12 +358,12 @@
                   },
                   "nullable": false
                 },
-                "model": {
+                "language": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
-                  "nullable": false
+                  "nullable": true
                 },
-                "name": {
+                "model": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
                   "nullable": false
@@ -539,7 +554,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "76691e30b4abacb2acba0fb37c9731a5f5fd7aaadcbc692ff4fd828852053d98"
+    "storageHash": "241ad9d3240c24b7f4f5cd661d4cfa08ecc270e8fe50a7f07e576f2e866b66af"
   },
   "execution": {
     "executionHash": "8f762a4a7cb0bd2c4fccc4d465d0a02bf46e02a5ef70ffc0d1ea4ebaf4960311",
