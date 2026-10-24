@@ -26,3 +26,5 @@ export type Transcription = {
   language?: string
   audioDurationMillis: number
 }
+
+export type SavedTranscription = Transcription & { id: TranscriptionID }

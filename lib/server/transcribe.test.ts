@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import { Transcription } from "../transcription"
-import { saveTranscriptions } from "./transcribe"
+import { saveTranscription } from "./transcribe"
 import { db } from "@/prisma/db"
 import { userId } from "../user"
 
@@ -20,11 +20,7 @@ describe("transcribe tests", () => {
       name: "Blob",
       email: "blob@blob.com"
     })
-    const [id, t] = (
-      await saveTranscriptions(db, userId(uid), [transcription])
-    )[0]
-
-    expect(transcription).toEqual(t)
+    const { id } = await saveTranscription(db, userId(uid), transcription)
 
     const dbTranscription = await db.orm.public.Transcript.where({
       id

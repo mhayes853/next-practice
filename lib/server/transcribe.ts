@@ -3,6 +3,7 @@ import {
   TranscriptionModelID,
   Transcription,
   TRANSCRIPTION_MODELS,
+  SavedTranscription,
   TranscriptionID
 } from "../transcription"
 import { readFile } from "node:fs/promises"
@@ -35,33 +36,25 @@ export async function transcribeFile(
   }
 }
 
-export async function saveTranscriptions(
+export async function saveTranscription(
   db: DatabaseConnection,
   userId: UserID,
-  transcriptions: Transcription[]
-) {
-  const savedTranscriptions = await Promise.all(
-    transcriptions.map(async (t) => {
-      const { id } = await db.orm.public.Transcript.select("id").create({
-        userId,
-        filename: t.filename,
-        audioDurationMillis: t.audioDurationMillis,
-        language: t.language,
-        model: t.model
-      })
-      return [id as TranscriptionID, t] as const
-    })
-  )
-
+  transcription: Transcription
+): Promise<SavedTranscription> {
+  const { id } = await db.orm.public.Transcript.select("id").create({
+    userId,
+    filename: transcription.filename,
+    audioDurationMillis: transcription.audioDurationMillis,
+    language: transcription.language,
+    model: transcription.model
+  })
   await db.orm.public.TranscriptPart.createAll(
-    savedTranscriptions.flatMap(([id, t]) => {
-      return t.segments.map((s) => ({
-        transcriptId: id,
-        timestamp: s.timestamp,
-        durationMillis: s.durationMillis,
-        content: s.content
-      }))
-    })
+    transcription.segments.map((s) => ({
+      transcriptId: id,
+      timestamp: s.timestamp,
+      durationMillis: s.durationMillis,
+      content: s.content
+    }))
   )
-  return savedTranscriptions
+  return { ...transcription, id: id as TranscriptionID }
 }
