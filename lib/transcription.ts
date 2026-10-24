@@ -1,4 +1,5 @@
 import { UserID } from "./user"
+import { base64URLDecode, base64URLEncode } from "./utils"
 
 export const TRANSCRIPTION_MODELS = {
   whisper1: {
@@ -34,4 +35,23 @@ export type SavedTranscription = Transcription & {
   userId: UserID
   createdAt: Date
   updatedAt: Date
+}
+
+export type TranscriptsCursor = {
+  id: TranscriptionID
+  date: Date
+}
+
+export function encodeCursor({ id, date }: TranscriptsCursor) {
+  return base64URLEncode(`${id}|${date.toISOString()}`)
+}
+
+export function decodeCursor(encodedCursor: string) {
+  try {
+    const splits = base64URLDecode(encodedCursor).split("|", 2)
+    if (splits.length < 2) return undefined
+    return { id: parseInt(splits[0]), date: new Date(splits[1]) }
+  } catch {
+    return undefined
+  }
 }

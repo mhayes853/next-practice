@@ -1,11 +1,10 @@
-export function compactMap<T, V>(
-  arr: T[],
-  fn: (value: T, index: number, arr: T[]) => V | null | undefined
-): V[] {
-  const values = [] as V[]
-  for (let i = 0; i < arr.length; i++) {
-    const value = fn(arr[i], i, arr)
-    if (value) values.push(value)
-  }
-  return values
+export function base64URLDecode(input: string) {
+  input = input.replace(/-/g, "+").replace(/_/g, "/")
+  const padLength = (4 - (input.length % 4)) % 4
+  input += "=".repeat(padLength)
+  return atob(input)
+}
+
+export function base64URLEncode(input: string) {
+  return btoa(input).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "")
 }
