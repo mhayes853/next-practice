@@ -13,7 +13,7 @@ export const TRANSCRIPTION_MODELS = {
 
 export type TranscriptionModelID = keyof typeof TRANSCRIPTION_MODELS
 
-export type TranscriptionID = number & { _tag: "transcript" }
+export type TranscriptionID = number
 
 export type TranscriptionSegment = {
   content: string

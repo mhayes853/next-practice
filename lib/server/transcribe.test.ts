@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest"
 import { Transcription } from "../transcription"
 import { saveTranscription, transcriptWithId } from "./transcribe"
 import { db } from "@/prisma/db"
-import { userId } from "../user"
 
 describe("transcribe tests", () => {
   it("should save transcriptions with ids", async () => {
@@ -16,15 +15,15 @@ describe("transcribe tests", () => {
       ],
       audioDurationMillis: 30_000
     }
-    const { id: uid } = await db.orm.public.User.create({
+    const { id: userId } = await db.orm.public.User.create({
       name: "Blob",
       email: "blob@blob.com"
     })
-    const saved = await saveTranscription(db, userId(uid), transcription)
+    const saved = await saveTranscription(db, userId, transcription)
     const stored = await transcriptWithId(db, saved.id)
 
     expect(saved).toMatchObject({
-      userId: userId(uid),
+      userId: userId,
       filename: transcription.filename,
       model: transcription.model,
       language: transcription.language

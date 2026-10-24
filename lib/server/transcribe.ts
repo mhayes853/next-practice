@@ -8,7 +8,7 @@ import {
 } from "../transcription"
 import { readFile } from "node:fs/promises"
 import { DatabaseConnection } from "@/prisma/db"
-import { userId, UserID } from "../user"
+import { UserID } from "../user"
 
 export type TranscribableFile = {
   filename: string
@@ -91,7 +91,7 @@ export async function transcriptWithId(
     language: transcription.language ?? undefined,
     filename: transcription.filename,
     model: transcription.model as TranscriptionModelID,
-    userId: userId(transcription.userId),
+    userId: transcription.userId,
     segments: transcription.parts.map((p) => ({
       id: p.id,
       content: p.content,
