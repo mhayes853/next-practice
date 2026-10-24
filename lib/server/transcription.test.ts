@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest"
 import { Transcription } from "../transcription"
-import { saveTranscription, transcriptWithId } from "./transcribe"
+import { saveTranscription, transcriptWithId } from "./transcription"
 import { db } from "@/prisma/db"
 
-describe("transcribe tests", () => {
+describe("transcription tests", () => {
   it("should save transcriptions with ids", async () => {
     const transcription: Transcription = {
       filename: "blob.mp3",
