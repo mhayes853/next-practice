@@ -8,7 +8,7 @@ import {
 } from "../transcription"
 import { readFile } from "node:fs/promises"
 import { DatabaseConnection } from "@/prisma/db"
-import { UserID } from "../user"
+import { userId, UserID } from "../user"
 
 export type TranscribableFile = {
   filename: string
@@ -41,14 +41,18 @@ export async function saveTranscription(
   userId: UserID,
   transcription: Transcription
 ): Promise<SavedTranscription> {
-  const { id } = await db.orm.public.Transcript.select("id").create({
+  const { id, createdAt, updatedAt } = await db.orm.public.Transcript.select(
+    "id",
+    "createdAt",
+    "updatedAt"
+  ).create({
     userId,
     filename: transcription.filename,
     audioDurationMillis: transcription.audioDurationMillis,
     language: transcription.language,
     model: transcription.model
   })
-  await db.orm.public.TranscriptPart.createAll(
+  const parts = await db.orm.public.TranscriptPart.createAll(
     transcription.segments.map((s) => ({
       transcriptId: id,
       timestamp: s.timestamp,
@@ -56,5 +60,43 @@ export async function saveTranscription(
       content: s.content
     }))
   )
-  return { ...transcription, id: id as TranscriptionID }
+  return {
+    ...transcription,
+    id: id as TranscriptionID,
+    userId,
+    createdAt: new Date(createdAt),
+    updatedAt: new Date(updatedAt),
+    segments: parts.map((p) => ({
+      id: p.id,
+      content: p.content,
+      durationMillis: p.durationMillis,
+      timestamp: p.timestamp
+    }))
+  }
+}
+
+export async function transcriptWithId(
+  db: DatabaseConnection,
+  id: TranscriptionID
+): Promise<SavedTranscription | null> {
+  const transcription = await db.orm.public.Transcript.include("parts")
+    .where({ id })
+    .first()
+  if (!transcription) return null
+  return {
+    id: transcription.id as TranscriptionID,
+    createdAt: new Date(transcription.createdAt),
+    updatedAt: new Date(transcription.updatedAt),
+    audioDurationMillis: transcription.audioDurationMillis,
+    language: transcription.language ?? undefined,
+    filename: transcription.filename,
+    model: transcription.model as TranscriptionModelID,
+    userId: userId(transcription.userId),
+    segments: transcription.parts.map((p) => ({
+      id: p.id,
+      content: p.content,
+      durationMillis: p.durationMillis,
+      timestamp: p.timestamp
+    }))
+  }
 }

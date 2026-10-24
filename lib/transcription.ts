@@ -1,3 +1,5 @@
+import { UserID } from "./user"
+
 export const TRANSCRIPTION_MODELS = {
   whisper1: {
     tag: "openai/whisper1",
@@ -27,4 +29,9 @@ export type Transcription = {
   audioDurationMillis: number
 }
 
-export type SavedTranscription = Transcription & { id: TranscriptionID }
+export type SavedTranscription = Transcription & {
+  id: TranscriptionID
+  userId: UserID
+  createdAt: Date
+  updatedAt: Date
+}

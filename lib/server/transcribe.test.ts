@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import { Transcription } from "../transcription"
-import { saveTranscription } from "./transcribe"
+import { saveTranscription, transcriptWithId } from "./transcribe"
 import { db } from "@/prisma/db"
 import { userId } from "../user"
 
@@ -20,22 +20,19 @@ describe("transcribe tests", () => {
       name: "Blob",
       email: "blob@blob.com"
     })
-    const { id } = await saveTranscription(db, userId(uid), transcription)
+    const saved = await saveTranscription(db, userId(uid), transcription)
+    const stored = await transcriptWithId(db, saved.id)
 
-    const dbTranscription = await db.orm.public.Transcript.where({
-      id
-    }).firstOrThrow()
-
-    expect(dbTranscription).toMatchObject({
+    expect(saved).toMatchObject({
       userId: userId(uid),
-      id,
       filename: transcription.filename,
       model: transcription.model,
       language: transcription.language
     })
+    expect(saved).toEqual(stored)
 
     const parts = await db.orm.public.TranscriptPart.where({
-      transcriptId: id
+      transcriptId: saved.id
     }).all()
     expect(parts).toMatchObject(transcription.segments)
   })
