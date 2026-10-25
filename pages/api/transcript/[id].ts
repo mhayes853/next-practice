@@ -1,4 +1,4 @@
-import { authenticatedHandler } from "@/lib/server/auth"
+import { authenticatedHandler, type SessionResolver } from "@/lib/server/auth"
 import {
   badRequest,
   forbidden,
@@ -9,13 +9,15 @@ import {
   deleteTranscriptById,
   transcriptWithId
 } from "@/lib/server/transcription"
-import { SavedTranscription } from "@/lib/transcription"
+import type { SavedTranscription } from "@/lib/transcription"
 import { db } from "@/prisma/db"
-import { NextApiRequest, NextApiResponse } from "next"
-import { Session } from "next-auth"
+import type { NextApiRequest, NextApiResponse } from "next"
+import type { Session } from "next-auth"
 import z from "zod"
 
-const QuerySchema = z.object({ id: z.string().transform((id) => parseInt(id)) })
+const QuerySchema = z.object({
+  id: z.string().regex(/^\d+$/).transform((id) => Number(id))
+})
 
 async function get(
   req: NextApiRequest,
@@ -46,18 +48,29 @@ async function del(
     if (session.user.id !== transcript.userId) return forbidden(res)
 
     await deleteTranscriptById(tx, result.data.id)
-    res.status(204)
+    res.status(204).end()
   })
 }
 
-export default authenticatedHandler<SavedTranscription>(
-  async (req, res, session) => {
-    if (req.method === "GET") {
-      get(req, res, session)
-    } else if (req.method === "DELETE") {
-      del(req, res, session)
-    } else {
-      invalidMethod(res)
-    }
-  }
-)
+type HandlerDependencies = {
+  resolveSession?: SessionResolver
+}
+
+export function createTranscriptByIdHandler({
+  resolveSession
+}: HandlerDependencies = {}) {
+  return authenticatedHandler<SavedTranscription>(
+    async (req, res, session) => {
+      if (req.method === "GET") {
+        await get(req, res, session)
+      } else if (req.method === "DELETE") {
+        await del(req, res, session)
+      } else {
+        invalidMethod(res)
+      }
+    },
+    resolveSession
+  )
+}
+
+export default createTranscriptByIdHandler()

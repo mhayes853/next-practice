@@ -131,11 +131,17 @@ export function authenticatedHandler<TData>(
     req: NextApiRequest,
     res: NextApiResponse<TData>,
     session: Session
-  ) => Promise<void>
+  ) => Promise<void>,
+  resolveSession: SessionResolver = (req, res) => getServerSession(req, res, authOptions)
 ) {
   return async (req: NextApiRequest, res: NextApiResponse) => {
-    const session = await getServerSession(req, res, authOptions)
+    const session = await resolveSession(req, res)
     if (!session) return res.status(401).json({ error: "unauthorized" })
     await handler(req, res, session)
   }
 }
+
+export type SessionResolver = (
+  req: NextApiRequest,
+  res: NextApiResponse
+) => Promise<Session | null>
