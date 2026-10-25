@@ -4,8 +4,16 @@ import { Adapter, AdapterAccount, AdapterUser } from "next-auth/adapters"
 import GitHubProvider from "next-auth/providers/github"
 import { Models } from "@/prisma/contract"
 import { UserID, userId } from "../user"
-import { NextApiRequest, NextApiResponse } from "next"
+import {
+  GetServerSideProps,
+  GetServerSidePropsContext,
+  GetServerSidePropsResult,
+  NextApiRequest,
+  NextApiResponse,
+  PreviewData
+} from "next"
 import type { DefaultSession } from "next-auth"
+import { ParsedUrlQuery } from "querystring"
 
 export const authAdapter = {
   createUser: async (user: Omit<AdapterUser, "id">) => {
@@ -126,13 +134,19 @@ export const authOptions: NextAuthOptions = {
   }
 }
 
+export type SessionResolver = (
+  req: NextApiRequest,
+  res: NextApiResponse
+) => Promise<Session | null>
+
 export function authenticatedHandler<TData>(
   handler: (
     req: NextApiRequest,
     res: NextApiResponse<TData>,
     session: Session
   ) => Promise<void>,
-  resolveSession: SessionResolver = (req, res) => getServerSession(req, res, authOptions)
+  resolveSession: SessionResolver = (req, res) =>
+    getServerSession(req, res, authOptions)
 ) {
   return async (req: NextApiRequest, res: NextApiResponse) => {
     const session = await resolveSession(req, res)
@@ -141,7 +155,30 @@ export function authenticatedHandler<TData>(
   }
 }
 
-export type SessionResolver = (
-  req: NextApiRequest,
-  res: NextApiResponse
-) => Promise<Session | null>
+export type AuthenticatedContext<
+  Params extends ParsedUrlQuery = ParsedUrlQuery
+> = GetServerSidePropsContext<Params, PreviewData> & {
+  session: Session
+}
+
+export function authenticatedGetServerSideProps<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Props extends { [key: string]: any },
+  Params extends ParsedUrlQuery = ParsedUrlQuery
+>(
+  handler: (
+    context: AuthenticatedContext<Params>
+  ) => Promise<GetServerSidePropsResult<Props>>
+): GetServerSideProps<Props, Params> {
+  return async (context) => {
+    const session = await getServerSession(
+      context.req,
+      context.res,
+      authOptions
+    )
+    if (!session) {
+      return { redirect: { destination: "/sign-in", permanent: false } }
+    }
+    return handler({ ...context, session })
+  }
+}
