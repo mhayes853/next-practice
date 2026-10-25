@@ -9,25 +9,23 @@ import {
   deleteTranscriptById,
   transcriptWithId
 } from "@/lib/server/transcription"
-import { SavedTranscription, TranscriptionID } from "@/lib/transcription"
+import { SavedTranscription } from "@/lib/transcription"
 import { db } from "@/prisma/db"
 import { NextApiRequest, NextApiResponse } from "next"
 import { Session } from "next-auth"
+import z from "zod"
 
-function transcriptId(req: NextApiRequest) {
-  const { id } = req.query
-  return typeof id === "string" ? (parseInt(id) as TranscriptionID) : undefined
-}
+const QuerySchema = z.object({ id: z.string().transform((id) => parseInt(id)) })
 
 async function get(
   req: NextApiRequest,
   res: NextApiResponse<SavedTranscription>,
   session: Session
 ) {
-  const id = transcriptId(req)
-  if (!id) return badRequest(res)
+  const result = QuerySchema.safeParse(req.query)
+  if (!result.success) return badRequest(res)
 
-  const transcript = await transcriptWithId(db, id)
+  const transcript = await transcriptWithId(db, result.data.id)
   if (!transcript) return notFound(res)
   if (session.user.id !== transcript.userId) return forbidden(res)
 
@@ -39,15 +37,15 @@ async function del(
   res: NextApiResponse,
   session: Session
 ) {
-  const id = transcriptId(req)
-  if (!id) return badRequest(res)
+  const result = QuerySchema.safeParse(req.query)
+  if (!result.success) return badRequest(res)
 
   await db.transaction(async (tx) => {
-    const transcript = await transcriptWithId(tx, id)
+    const transcript = await transcriptWithId(tx, result.data.id)
     if (!transcript) return notFound(res)
     if (session.user.id !== transcript.userId) return forbidden(res)
 
-    await deleteTranscriptById(tx, id)
+    await deleteTranscriptById(tx, result.data.id)
     res.status(204)
   })
 }
