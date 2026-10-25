@@ -1,3 +1,4 @@
+import z from "zod"
 import { UserID } from "./user"
 import { base64URLDecode, base64URLEncode } from "./utils"
 
@@ -11,6 +12,10 @@ export const TRANSCRIPTION_MODELS = {
     displayName: "Transcribe 1 (Fish Audio)"
   }
 } as const
+
+export const TranscriptionModelIDSchema = z.enum(
+  Object.keys(TRANSCRIPTION_MODELS) as TranscriptionModelID[]
+)
 
 export type TranscriptionModelID = keyof typeof TRANSCRIPTION_MODELS
 

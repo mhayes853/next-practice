@@ -6,11 +6,10 @@ import {
   userTranscripts
 } from "@/lib/server/transcription"
 import {
-  TRANSCRIPTION_MODELS,
-  TranscriptionModelID,
   SavedTranscription,
   decodeCursor,
-  encodeCursor
+  encodeCursor,
+  TranscriptionModelIDSchema
 } from "@/lib/transcription"
 import { db } from "@/prisma/db"
 import formidable from "formidable"
@@ -35,16 +34,11 @@ async function post(
   const form = formidable({ maxFileSize: TEN_MB })
   const [fields, files] = await form.parse(req)
   const file = files.attachments?.[0]
-  const requestedModel = fields.model?.[0]
+  const requestedModel = TranscriptionModelIDSchema.safeParse(fields.model?.[0])
 
-  if (
-    typeof requestedModel !== "string" ||
-    !Object.hasOwn(TRANSCRIPTION_MODELS, requestedModel) ||
-    !file
-  )
-    return badRequest(res)
+  if (!requestedModel.success || !file) return badRequest(res)
 
-  const modelId = requestedModel as TranscriptionModelID
+  const modelId = requestedModel.data
   const transcription = await transcribe(
     {
       filename: file.originalFilename ?? file.newFilename,
