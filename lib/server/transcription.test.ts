@@ -56,20 +56,10 @@ describe("transcription tests", () => {
     const user = await testUser()
     const t1 = await saveTranscription(db, user.id, TEST_TRANSCRIPTION)
     const t2 = await saveTranscription(db, user.id, TEST_TRANSCRIPTION)
-    const didDelete = await deleteTranscriptById(db, t1.id, user.id)
+    await deleteTranscriptById(db, t1.id)
 
-    expect(didDelete).toEqual(true)
     expect(await transcriptWithId(db, t1.id)).toBeNull()
     expect(await transcriptWithId(db, t2.id)).toEqual(t2)
-  })
-
-  it("shouldn't delete a transcript when user id does not match", async () => {
-    const user = await testUser()
-    const t1 = await saveTranscription(db, user.id, TEST_TRANSCRIPTION)
-
-    const didDelete = await deleteTranscriptById(db, t1.id, -1)
-    expect(didDelete).toEqual(false)
-    expect(await transcriptWithId(db, t1.id)).toEqual(t1)
   })
 })
 

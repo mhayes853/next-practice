@@ -74,13 +74,9 @@ export async function transcriptWithId(
 
 export async function deleteTranscriptById(
   db: DatabaseConnection,
-  id: TranscriptionID,
-  userId: UserID
+  id: TranscriptionID
 ) {
-  const tid = await db.orm.public.Transcript.where({ id, userId })
-    .select("id")
-    .delete()
-  return tid !== null
+  await db.orm.public.Transcript.where({ id }).deleteAndCount()
 }
 
 export type UserTranscriptsPage = {

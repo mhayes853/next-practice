@@ -1,6 +1,6 @@
 import { authenticatedHandler } from "@/lib/server/auth"
 import { badRequest, invalidMethod } from "@/lib/server/invalid-requests"
-import { saveTranscription, transcribeFile } from "@/lib/server/transcribe"
+import { saveTranscription, transcribeFile } from "@/lib/server/transcription"
 import { TranscriptionModelID, SavedTranscription } from "@/lib/transcription"
 import { db } from "@/prisma/db"
 import formidable from "formidable"
