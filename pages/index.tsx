@@ -15,6 +15,7 @@ export const getServerSideProps = authenticatedGetServerSideProps(
   async (context) => {
     return {
       props: {
+        session: context.session,
         initialPage: (await userTranscripts(
           db,
           context.session.user.id,
