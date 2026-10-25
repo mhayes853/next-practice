@@ -4,11 +4,13 @@ import {
   Transcription,
   TRANSCRIPTION_MODELS,
   SavedTranscription,
-  TranscriptionID
+  TranscriptionID,
+  TranscriptsCursor
 } from "../transcription"
 import { readFile } from "node:fs/promises"
 import { DatabaseConnection } from "@/prisma/db"
 import { UserID } from "../user"
+import { Models } from "@/prisma/contract"
 
 export type TranscribableFile = {
   filename: string
@@ -41,11 +43,7 @@ export async function saveTranscription(
   userId: UserID,
   transcription: Transcription
 ): Promise<SavedTranscription> {
-  const { id, createdAt, updatedAt } = await db.orm.public.Transcript.select(
-    "id",
-    "createdAt",
-    "updatedAt"
-  ).create({
+  const saved = await db.orm.public.Transcript.create({
     userId,
     filename: transcription.filename,
     audioDurationMillis: transcription.audioDurationMillis,
@@ -54,25 +52,13 @@ export async function saveTranscription(
   })
   const parts = await db.orm.public.TranscriptPart.createAll(
     transcription.segments.map((s) => ({
-      transcriptId: id,
+      transcriptId: saved.id,
       timestamp: s.timestamp,
       durationMillis: s.durationMillis,
       content: s.content
     }))
   )
-  return {
-    ...transcription,
-    id: id as TranscriptionID,
-    userId,
-    createdAt: new Date(createdAt),
-    updatedAt: new Date(updatedAt),
-    segments: parts.map((p) => ({
-      id: p.id,
-      content: p.content,
-      durationMillis: p.durationMillis,
-      timestamp: p.timestamp
-    }))
-  }
+  return savedTranscription({ ...saved, parts })
 }
 
 export async function transcriptWithId(
@@ -83,6 +69,44 @@ export async function transcriptWithId(
     .where({ id })
     .first()
   if (!transcription) return null
+  return savedTranscription(transcription)
+}
+
+export type UserTranscriptsPage = {
+  transcripts: SavedTranscription[]
+  nextCursor?: TranscriptsCursor
+}
+
+export async function userTranscripts(
+  db: DatabaseConnection,
+  userId: UserID,
+  limit: number,
+  cursor?: TranscriptsCursor
+): Promise<UserTranscriptsPage> {
+  const transcripts = (
+    await db.orm.public.Transcript.include("parts", (p) =>
+      p.orderBy((p) => p.id.asc())
+    )
+      .where({ userId })
+      .where((t) => t.id.gte(cursor?.id ?? -1))
+      .orderBy((t) => t.id.asc())
+      .limit(limit + 1)
+      .all()
+  ).map(savedTranscription)
+
+  if (transcripts.length < limit + 1) {
+    return { transcripts }
+  } else {
+    const lastId = transcripts.pop()?.id ?? -1
+    return { transcripts, nextCursor: { id: lastId } }
+  }
+}
+
+function savedTranscription(
+  transcription: Omit<Models.public_Transcript, "user" | "parts"> & {
+    parts: Omit<Models.public_TranscriptPart, "transcript">[]
+  }
+) {
   return {
     id: transcription.id as TranscriptionID,
     createdAt: new Date(transcription.createdAt),

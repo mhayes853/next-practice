@@ -39,18 +39,15 @@ export type SavedTranscription = Transcription & {
 
 export type TranscriptsCursor = {
   id: TranscriptionID
-  date: Date
 }
 
-export function encodeCursor({ id, date }: TranscriptsCursor) {
-  return base64URLEncode(`${id}|${date.toISOString()}`)
+export function encodeCursor({ id }: TranscriptsCursor) {
+  return base64URLEncode(`${id}`)
 }
 
 export function decodeCursor(encodedCursor: string) {
   try {
-    const splits = base64URLDecode(encodedCursor).split("|", 2)
-    if (splits.length < 2) return undefined
-    return { id: parseInt(splits[0]), date: new Date(splits[1]) }
+    return { id: parseInt(base64URLDecode(encodedCursor)) }
   } catch {
     return undefined
   }
