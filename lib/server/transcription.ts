@@ -72,6 +72,17 @@ export async function transcriptWithId(
   return savedTranscription(transcription)
 }
 
+export async function deleteTranscriptById(
+  db: DatabaseConnection,
+  id: TranscriptionID,
+  userId: UserID
+) {
+  const tid = await db.orm.public.Transcript.where({ id, userId })
+    .select("id")
+    .delete()
+  return tid !== null
+}
+
 export type UserTranscriptsPage = {
   transcripts: SavedTranscription[]
   nextCursor?: TranscriptsCursor

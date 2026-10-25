@@ -1,0 +1,86 @@
+[
+  {
+    "id": "dropConstraint.TranscriptPart.TranscriptPart_transcriptId_fkey",
+    "label": "Drop constraint \"TranscriptPart_transcriptId_fkey\" on \"TranscriptPart\"",
+    "operationClass": "widening",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "TranscriptPart_transcriptId_fkey",
+        "table": "TranscriptPart"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"TranscriptPart_transcriptId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "TranscriptPart_transcriptId_fkey",
+          "public",
+          "\"public\".\"TranscriptPart\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop constraint \"TranscriptPart_transcriptId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"TranscriptPart\" DROP CONSTRAINT \"TranscriptPart_transcriptId_fkey\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"TranscriptPart_transcriptId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "TranscriptPart_transcriptId_fkey",
+          "public",
+          "\"public\".\"TranscriptPart\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.TranscriptPart.TranscriptPart_transcriptId_fkey",
+    "label": "Add foreign key \"TranscriptPart_transcriptId_fkey\" on \"TranscriptPart\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "TranscriptPart_transcriptId_fkey",
+        "table": "TranscriptPart"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"TranscriptPart_transcriptId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "TranscriptPart_transcriptId_fkey",
+          "public",
+          "\"public\".\"TranscriptPart\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"TranscriptPart_transcriptId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"TranscriptPart\"\nADD CONSTRAINT \"TranscriptPart_transcriptId_fkey\"\nFOREIGN KEY (\"transcriptId\")\nREFERENCES \"public\".\"Transcript\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"TranscriptPart_transcriptId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "TranscriptPart_transcriptId_fkey",
+          "public",
+          "\"public\".\"TranscriptPart\""
+        ]
+      }
+    ]
+  }
+]

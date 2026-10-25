@@ -454,6 +454,7 @@
                   "index": {
                     "name": "TranscriptPart_transcriptId_idx_bdef8e7f"
                   },
+                  "onDelete": "cascade",
                   "source": {
                     "columns": [
                       "transcriptId"
@@ -554,7 +555,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "241ad9d3240c24b7f4f5cd661d4cfa08ecc270e8fe50a7f07e576f2e866b66af"
+    "storageHash": "b1a4637c703bbe4f2312712a8575115670738e05d31d3751eea7cee4ef244823"
   },
   "execution": {
     "executionHash": "8f762a4a7cb0bd2c4fccc4d465d0a02bf46e02a5ef70ffc0d1ea4ebaf4960311",

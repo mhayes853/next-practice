@@ -29,6 +29,6 @@ model TranscriptPart {
   content String
   timestamp Float
   durationMillis Float
-  transcript Transcript @relation(fields: [transcriptId], references: [id])
+  transcript Transcript @relation(fields: [transcriptId], references: [id], onDelete: Cascade)
   transcriptId Int
 }

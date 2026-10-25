@@ -1,0 +1,340 @@
+[
+  {
+    "id": "schema.public",
+    "label": "Create schema \"public\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres"
+    },
+    "precheck": [],
+    "execute": [
+      {
+        "description": "Create schema \"public\"",
+        "sql": "CREATE SCHEMA IF NOT EXISTS \"public\"",
+        "params": []
+      }
+    ],
+    "postcheck": []
+  },
+  {
+    "id": "table.Transcript",
+    "label": "Create table \"Transcript\"",
+    "summary": "Creates table \"Transcript\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Transcript"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Transcript\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Transcript\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"Transcript\"",
+        "sql": "CREATE TABLE \"public\".\"Transcript\" (\n  \"audioDurationMillis\" float8 NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"filename\" text NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"language\" text,\n  \"model\" text NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  \"userId\" int4 NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Transcript\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Transcript\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.TranscriptPart",
+    "label": "Create table \"TranscriptPart\"",
+    "summary": "Creates table \"TranscriptPart\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "TranscriptPart"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"TranscriptPart\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"TranscriptPart\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"TranscriptPart\"",
+        "sql": "CREATE TABLE \"public\".\"TranscriptPart\" (\n  \"content\" text NOT NULL,\n  \"durationMillis\" float8 NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"timestamp\" float8 NOT NULL,\n  \"transcriptId\" int4 NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"TranscriptPart\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"TranscriptPart\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.User",
+    "label": "Create table \"User\"",
+    "summary": "Creates table \"User\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "User"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"User\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"User\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"User\"",
+        "sql": "CREATE TABLE \"public\".\"User\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"email\" text NOT NULL,\n  \"emailVerified\" timestamptz,\n  \"id\" SERIAL NOT NULL,\n  \"name\" text,\n  \"providerId\" text,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"User\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"User\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.User.User_email_key",
+    "label": "Add unique constraint on \"User\" (email)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "User_email_key",
+        "table": "User"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"User_email_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "User_email_key",
+          "public",
+          "\"public\".\"User\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"User_email_key\"",
+        "sql": "ALTER TABLE \"public\".\"User\" ADD CONSTRAINT \"User_email_key\" UNIQUE (\"email\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"User_email_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "User_email_key",
+          "public",
+          "\"public\".\"User\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.Transcript.Transcript_userId_idx_a489d58a",
+    "label": "Create index \"Transcript_userId_idx_a489d58a\" on \"Transcript\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "Transcript_userId_idx_a489d58a",
+        "table": "Transcript"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"Transcript_userId_idx_a489d58a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Transcript_userId_idx_a489d58a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"Transcript_userId_idx_a489d58a\"",
+        "sql": "CREATE INDEX \"Transcript_userId_idx_a489d58a\" ON \"public\".\"Transcript\" (\"userId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"Transcript_userId_idx_a489d58a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Transcript_userId_idx_a489d58a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.TranscriptPart.TranscriptPart_transcriptId_idx_bdef8e7f",
+    "label": "Create index \"TranscriptPart_transcriptId_idx_bdef8e7f\" on \"TranscriptPart\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "TranscriptPart_transcriptId_idx_bdef8e7f",
+        "table": "TranscriptPart"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"TranscriptPart_transcriptId_idx_bdef8e7f\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"TranscriptPart_transcriptId_idx_bdef8e7f\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"TranscriptPart_transcriptId_idx_bdef8e7f\"",
+        "sql": "CREATE INDEX \"TranscriptPart_transcriptId_idx_bdef8e7f\" ON \"public\".\"TranscriptPart\" (\"transcriptId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"TranscriptPart_transcriptId_idx_bdef8e7f\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"TranscriptPart_transcriptId_idx_bdef8e7f\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.Transcript.Transcript_userId_fkey",
+    "label": "Add foreign key \"Transcript_userId_fkey\" on \"Transcript\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "Transcript_userId_fkey",
+        "table": "Transcript"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"Transcript_userId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Transcript_userId_fkey",
+          "public",
+          "\"public\".\"Transcript\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"Transcript_userId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"Transcript\"\nADD CONSTRAINT \"Transcript_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"public\".\"User\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"Transcript_userId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Transcript_userId_fkey",
+          "public",
+          "\"public\".\"Transcript\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.TranscriptPart.TranscriptPart_transcriptId_fkey",
+    "label": "Add foreign key \"TranscriptPart_transcriptId_fkey\" on \"TranscriptPart\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "TranscriptPart_transcriptId_fkey",
+        "table": "TranscriptPart"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"TranscriptPart_transcriptId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "TranscriptPart_transcriptId_fkey",
+          "public",
+          "\"public\".\"TranscriptPart\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"TranscriptPart_transcriptId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"TranscriptPart\"\nADD CONSTRAINT \"TranscriptPart_transcriptId_fkey\"\nFOREIGN KEY (\"transcriptId\")\nREFERENCES \"public\".\"Transcript\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"TranscriptPart_transcriptId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "TranscriptPart_transcriptId_fkey",
+          "public",
+          "\"public\".\"TranscriptPart\""
+        ]
+      }
+    ]
+  }
+]

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 import { Transcription } from "../transcription"
 import {
+  deleteTranscriptById,
   saveTranscription,
   transcriptWithId,
   userTranscripts
@@ -49,6 +50,26 @@ describe("transcription tests", () => {
     expect(p1.transcripts).toEqual([t1])
     expect(p2.transcripts).toEqual([t2])
     expect(p2.nextCursor).toBeUndefined()
+  })
+
+  it("should be able to delete a transcript for a user", async () => {
+    const user = await testUser()
+    const t1 = await saveTranscription(db, user.id, TEST_TRANSCRIPTION)
+    const t2 = await saveTranscription(db, user.id, TEST_TRANSCRIPTION)
+    const didDelete = await deleteTranscriptById(db, t1.id, user.id)
+
+    expect(didDelete).toEqual(true)
+    expect(await transcriptWithId(db, t1.id)).toBeNull()
+    expect(await transcriptWithId(db, t2.id)).toEqual(t2)
+  })
+
+  it("shouldn't delete a transcript when user id does not match", async () => {
+    const user = await testUser()
+    const t1 = await saveTranscription(db, user.id, TEST_TRANSCRIPTION)
+
+    const didDelete = await deleteTranscriptById(db, t1.id, -1)
+    expect(didDelete).toEqual(false)
+    expect(await transcriptWithId(db, t1.id)).toEqual(t1)
   })
 })
 
