@@ -3,7 +3,7 @@ import { badRequest, invalidMethod } from "@/lib/server/invalid-requests"
 import {
   saveTranscription,
   transcribeFile,
-  userTranscripts
+  userTranscriptions
 } from "@/lib/server/transcription"
 import {
   SavedTranscription,
@@ -73,7 +73,7 @@ async function get(
   const query = GetQuerySchema.safeParse(req.query)
   if (!query.success) return badRequest(res)
 
-  const page = await userTranscripts(
+  const page = await userTranscriptions(
     db,
     session.user.id,
     query.data.limit,

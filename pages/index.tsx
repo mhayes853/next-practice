@@ -1,5 +1,5 @@
 import { authenticatedGetServerSideProps } from "@/lib/server/auth"
-import { userTranscripts } from "@/lib/server/transcription"
+import { userTranscriptions } from "@/lib/server/transcription"
 import { TranscriptionsPage } from "@/lib/transcription"
 import { db } from "@/prisma/db"
 import { Session } from "next-auth"
@@ -16,7 +16,7 @@ export const getServerSideProps = authenticatedGetServerSideProps(
     return {
       props: {
         session: context.session,
-        initialPage: (await userTranscripts(
+        initialPage: (await userTranscriptions(
           db,
           context.session.user.id,
           LIMIT,

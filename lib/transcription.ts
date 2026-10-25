@@ -50,11 +50,11 @@ export const SavedTranscriptionSchema = TranscriptionSchema.extend({
 
 export type SavedTranscription = z.infer<typeof SavedTranscriptionSchema>
 
-export type TranscriptsCursor = {
+export type TranscriptionsCursor = {
   id: TranscriptionID
 }
 
-export function encodeCursor({ id }: TranscriptsCursor) {
+export function encodeCursor({ id }: TranscriptionsCursor) {
   return base64URLEncode(`${id}`)
 }
 

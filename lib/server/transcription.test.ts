@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest"
 import { Transcription, TranscriptionsPage } from "../transcription"
 import {
-  deleteTranscriptById,
+  deleteTranscriptionById,
   saveTranscription,
-  transcriptWithId,
-  userTranscripts
+  transcriptionWithId,
+  userTranscriptions
 } from "./transcription"
 import { db } from "@/prisma/db"
 
@@ -23,7 +23,7 @@ describe("transcription tests", () => {
   it("should save transcriptions with ids", async () => {
     const { id: userId } = await testUser()
     const saved = await saveTranscription(db, userId, TEST_TRANSCRIPTION)
-    const stored = await transcriptWithId(db, saved.id)
+    const stored = await transcriptionWithId(db, saved.id)
 
     expect(saved).toMatchObject({
       userId: userId,
@@ -44,13 +44,13 @@ describe("transcription tests", () => {
     const t1 = await saveTranscription(db, user.id, TEST_TRANSCRIPTION)
     const t2 = await saveTranscription(db, user.id, TEST_TRANSCRIPTION)
 
-    const p1 = (await userTranscripts(
+    const p1 = (await userTranscriptions(
       db,
       user.id,
       1,
       null
     )) as TranscriptionsPage
-    const p2 = (await userTranscripts(
+    const p2 = (await userTranscriptions(
       db,
       user.id,
       1,
@@ -64,7 +64,7 @@ describe("transcription tests", () => {
 
   it("should return an invalid cursor when the cursor is invalid", async () => {
     const user = await testUser()
-    const t1 = await userTranscripts(db, user.id, 1, "blob")
+    const t1 = await userTranscriptions(db, user.id, 1, "blob")
     // console.log(t1)
     expect(t1).toEqual("invalid-cursor")
   })
@@ -73,10 +73,10 @@ describe("transcription tests", () => {
     const user = await testUser()
     const t1 = await saveTranscription(db, user.id, TEST_TRANSCRIPTION)
     const t2 = await saveTranscription(db, user.id, TEST_TRANSCRIPTION)
-    await deleteTranscriptById(db, t1.id)
+    await deleteTranscriptionById(db, t1.id)
 
-    expect(await transcriptWithId(db, t1.id)).toBeNull()
-    expect(await transcriptWithId(db, t2.id)).toEqual(t2)
+    expect(await transcriptionWithId(db, t1.id)).toBeNull()
+    expect(await transcriptionWithId(db, t2.id)).toEqual(t2)
   })
 })
 

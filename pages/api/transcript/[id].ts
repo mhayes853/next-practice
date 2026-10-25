@@ -6,8 +6,8 @@ import {
   notFound
 } from "@/lib/server/invalid-requests"
 import {
-  deleteTranscriptById,
-  transcriptWithId
+  deleteTranscriptionById,
+  transcriptionWithId
 } from "@/lib/server/transcription"
 import type { SavedTranscription } from "@/lib/transcription"
 import { db } from "@/prisma/db"
@@ -16,7 +16,10 @@ import type { Session } from "next-auth"
 import z from "zod"
 
 const QuerySchema = z.object({
-  id: z.string().regex(/^\d+$/).transform((id) => Number(id))
+  id: z
+    .string()
+    .regex(/^\d+$/)
+    .transform((id) => Number(id))
 })
 
 async function get(
@@ -27,7 +30,7 @@ async function get(
   const result = QuerySchema.safeParse(req.query)
   if (!result.success) return badRequest(res)
 
-  const transcript = await transcriptWithId(db, result.data.id)
+  const transcript = await transcriptionWithId(db, result.data.id)
   if (!transcript) return notFound(res)
   if (session.user.id !== transcript.userId) return forbidden(res)
 
@@ -43,11 +46,11 @@ async function del(
   if (!result.success) return badRequest(res)
 
   await db.transaction(async (tx) => {
-    const transcript = await transcriptWithId(tx, result.data.id)
+    const transcript = await transcriptionWithId(tx, result.data.id)
     if (!transcript) return notFound(res)
     if (session.user.id !== transcript.userId) return forbidden(res)
 
-    await deleteTranscriptById(tx, result.data.id)
+    await deleteTranscriptionById(tx, result.data.id)
     res.status(204).end()
   })
 }
@@ -59,18 +62,15 @@ type HandlerDependencies = {
 export function createTranscriptByIdHandler({
   resolveSession
 }: HandlerDependencies = {}) {
-  return authenticatedHandler<SavedTranscription>(
-    async (req, res, session) => {
-      if (req.method === "GET") {
-        await get(req, res, session)
-      } else if (req.method === "DELETE") {
-        await del(req, res, session)
-      } else {
-        invalidMethod(res)
-      }
-    },
-    resolveSession
-  )
+  return authenticatedHandler<SavedTranscription>(async (req, res, session) => {
+    if (req.method === "GET") {
+      await get(req, res, session)
+    } else if (req.method === "DELETE") {
+      await del(req, res, session)
+    } else {
+      invalidMethod(res)
+    }
+  }, resolveSession)
 }
 
 export default createTranscriptByIdHandler()

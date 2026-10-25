@@ -63,7 +63,7 @@ export async function saveTranscription(
   return savedTranscription({ ...saved, parts })
 }
 
-export async function transcriptWithId(
+export async function transcriptionWithId(
   db: DatabaseConnection,
   id: TranscriptionID
 ): Promise<SavedTranscription | null> {
@@ -74,14 +74,14 @@ export async function transcriptWithId(
   return savedTranscription(transcription)
 }
 
-export async function deleteTranscriptById(
+export async function deleteTranscriptionById(
   db: DatabaseConnection,
   id: TranscriptionID
 ) {
   await db.orm.public.Transcript.where({ id }).deleteAndCount()
 }
 
-export async function userTranscripts(
+export async function userTranscriptions(
   db: DatabaseConnection,
   userId: UserID,
   limit: number,
