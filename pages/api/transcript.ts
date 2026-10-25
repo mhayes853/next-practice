@@ -7,9 +7,8 @@ import {
 } from "@/lib/server/transcription"
 import {
   SavedTranscription,
-  decodeCursor,
-  encodeCursor,
-  TranscriptionModelIDSchema
+  TranscriptionModelIDSchema,
+  TranscriptionsPage
 } from "@/lib/transcription"
 import { db } from "@/prisma/db"
 import formidable from "formidable"
@@ -62,13 +61,13 @@ const GetQuerySchema = z.object({
     .refine(Number.isSafeInteger),
   cursor: z
     .string()
-    .transform((c) => decodeCursor(c))
     .optional()
+    .transform((c) => c ?? null)
 })
 
 async function get(
   req: NextApiRequest,
-  res: NextApiResponse,
+  res: NextApiResponse<TranscriptionsPage>,
   session: Session
 ) {
   const query = GetQuerySchema.safeParse(req.query)
@@ -80,10 +79,8 @@ async function get(
     query.data.limit,
     query.data.cursor
   )
-  res.status(200).json({
-    ...page,
-    nextCursor: page.nextCursor ? encodeCursor(page.nextCursor) : null
-  })
+  if (page === "invalid-cursor") return badRequest(res)
+  res.status(200).json(page)
 }
 
 type HandlerDependencies = {

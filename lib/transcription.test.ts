@@ -10,5 +10,7 @@ describe("transcription tests", () => {
 
   it("should return undefined for an invalid cursor", () => {
     expect(decodeCursor("hello world")).toBeUndefined()
+    expect(decodeCursor("YmxvYg==")).toBeUndefined()
+    expect(decodeCursor("aW5m")).toBeUndefined()
   })
 })

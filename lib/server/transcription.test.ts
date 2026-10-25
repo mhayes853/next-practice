@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { Transcription } from "../transcription"
+import { Transcription, TranscriptionsPage } from "../transcription"
 import {
   deleteTranscriptById,
   saveTranscription,
@@ -44,12 +44,29 @@ describe("transcription tests", () => {
     const t1 = await saveTranscription(db, user.id, TEST_TRANSCRIPTION)
     const t2 = await saveTranscription(db, user.id, TEST_TRANSCRIPTION)
 
-    const p1 = await userTranscripts(db, user.id, 1)
-    const p2 = await userTranscripts(db, user.id, 1, p1.nextCursor)
+    const p1 = (await userTranscripts(
+      db,
+      user.id,
+      1,
+      null
+    )) as TranscriptionsPage
+    const p2 = (await userTranscripts(
+      db,
+      user.id,
+      1,
+      p1.nextCursor
+    )) as TranscriptionsPage
 
-    expect(p1.transcripts).toEqual([t1])
-    expect(p2.transcripts).toEqual([t2])
-    expect(p2.nextCursor).toBeUndefined()
+    expect(p1.transcriptions).toEqual([t1])
+    expect(p2.transcriptions).toEqual([t2])
+    expect(p2.nextCursor).toBeNull()
+  })
+
+  it("should return an invalid cursor when the cursor is invalid", async () => {
+    const user = await testUser()
+    const t1 = await userTranscripts(db, user.id, 1, "blob")
+    // console.log(t1)
+    expect(t1).toEqual("invalid-cursor")
   })
 
   it("should be able to delete a transcript for a user", async () => {

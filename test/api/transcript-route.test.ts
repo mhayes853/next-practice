@@ -49,21 +49,30 @@ describe("/api/transcript", () => {
   it("returns 401 when the caller is not signed in", async () => {
     activeSession = null
 
-    const response = await callApiRoute(pagesHandler, { method: "GET", path: "/api/transcript?limit=10" })
+    const response = await callApiRoute(pagesHandler, {
+      method: "GET",
+      path: "/api/transcript?limit=10"
+    })
 
     expect(response.status).toBe(401)
     expect(JSON.parse(response.body)).toEqual({ error: "unauthorized" })
   })
 
   it("rejects unsupported methods", async () => {
-    const response = await callApiRoute(pagesHandler, { method: "PUT", path: "/api/transcript" })
+    const response = await callApiRoute(pagesHandler, {
+      method: "PUT",
+      path: "/api/transcript"
+    })
 
     expect(response.status).toBe(405)
     expect(JSON.parse(response.body)).toEqual({ error: "invalid method" })
   })
 
   it("validates list query parameters", async () => {
-    const response = await callApiRoute(pagesHandler, { method: "GET", path: "/api/transcript?limit=0" })
+    const response = await callApiRoute(pagesHandler, {
+      method: "GET",
+      path: "/api/transcript?limit=0"
+    })
     const partiallyNumeric = await callApiRoute(pagesHandler, {
       method: "GET",
       path: "/api/transcript?limit=2invalid"
@@ -87,7 +96,10 @@ describe("/api/transcript", () => {
       name: "Another owner",
       email: "transcript-api-other@example.test"
     })
-    await saveTranscription(db, other.id as UserID, { ...TEST_TRANSCRIPTION, filename: "private.wav" })
+    await saveTranscription(db, other.id as UserID, {
+      ...TEST_TRANSCRIPTION,
+      filename: "private.wav"
+    })
 
     const response = await callApiRoute(pagesHandler, {
       method: "GET",
@@ -96,22 +108,26 @@ describe("/api/transcript", () => {
     const page = JSON.parse(response.body)
 
     expect(response.status).toBe(200)
-    expect(page.transcripts).toHaveLength(1)
-    expect(page.transcripts[0]).toMatchObject({
+    expect(page.transcriptions).toHaveLength(1)
+    expect(page.transcriptions[0]).toMatchObject({
       id: first.id,
       filename: "first.wav",
       userId: ownerId
     })
-    expect(page.nextCursor).toBe(Buffer.from(String(second.id)).toString("base64url"))
+    expect(page.nextCursor).toBe(
+      Buffer.from(String(second.id)).toString("base64url")
+    )
   })
 
   it("accepts multipart uploads, mocks transcription, and persists the result", async () => {
     const boundary = "api-test-boundary"
-    const body = Buffer.from([
-      `--${boundary}\r\nContent-Disposition: form-data; name="model"\r\n\r\ntranscribe1\r\n`,
-      `--${boundary}\r\nContent-Disposition: form-data; name="attachments"; filename="sample.wav"\r\nContent-Type: audio/wav\r\n\r\nfake audio bytes\r\n`,
-      `--${boundary}--\r\n`
-    ].join(""))
+    const body = Buffer.from(
+      [
+        `--${boundary}\r\nContent-Disposition: form-data; name="model"\r\n\r\ntranscribe1\r\n`,
+        `--${boundary}\r\nContent-Disposition: form-data; name="attachments"; filename="sample.wav"\r\nContent-Type: audio/wav\r\n\r\nfake audio bytes\r\n`,
+        `--${boundary}--\r\n`
+      ].join("")
+    )
     const response = await callApiRoute(pagesHandler, {
       method: "POST",
       path: "/api/transcript",
@@ -125,7 +141,10 @@ describe("/api/transcript", () => {
 
     expect(response.status).toBe(201)
     expect(transcribeCalls).toHaveLength(1)
-    expect(transcribeCalls[0][0]).toMatchObject({ filename: "sample.wav", filepath: expect.any(String) })
+    expect(transcribeCalls[0][0]).toMatchObject({
+      filename: "sample.wav",
+      filepath: expect.any(String)
+    })
     expect(transcribeCalls[0][1]).toBe("transcribe1")
     expect(saved).toMatchObject({
       filename: TEST_TRANSCRIPTION.filename,
@@ -133,7 +152,9 @@ describe("/api/transcript", () => {
       userId: ownerId,
       segments: TEST_TRANSCRIPTION.segments
     })
-    expect(await db.orm.public.TranscriptPart.where({ transcriptId: saved.id }).all()).toHaveLength(1)
+    expect(
+      await db.orm.public.TranscriptPart.where({ transcriptId: saved.id }).all()
+    ).toHaveLength(1)
   })
 
   it("rejects multipart uploads without a model or file", async () => {
@@ -156,11 +177,13 @@ describe("/api/transcript", () => {
 
   it("rejects multipart uploads with an unsupported model", async () => {
     const boundary = "invalid-model-boundary"
-    const body = Buffer.from([
-      `--${boundary}\r\nContent-Disposition: form-data; name="model"\r\n\r\nunknown-model\r\n`,
-      `--${boundary}\r\nContent-Disposition: form-data; name="attachments"; filename="sample.wav"\r\nContent-Type: audio/wav\r\n\r\nfake audio bytes\r\n`,
-      `--${boundary}--\r\n`
-    ].join(""))
+    const body = Buffer.from(
+      [
+        `--${boundary}\r\nContent-Disposition: form-data; name="model"\r\n\r\nunknown-model\r\n`,
+        `--${boundary}\r\nContent-Disposition: form-data; name="attachments"; filename="sample.wav"\r\nContent-Type: audio/wav\r\n\r\nfake audio bytes\r\n`,
+        `--${boundary}--\r\n`
+      ].join("")
+    )
     const response = await callApiRoute(pagesHandler, {
       method: "POST",
       path: "/api/transcript",

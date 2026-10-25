@@ -5,7 +5,9 @@ import {
   TRANSCRIPTION_MODELS,
   SavedTranscription,
   TranscriptionID,
-  TranscriptsCursor
+  TranscriptionsPage,
+  decodeCursor,
+  encodeCursor
 } from "../transcription"
 import { readFile } from "node:fs/promises"
 import { DatabaseConnection } from "@/prisma/db"
@@ -33,7 +35,7 @@ export async function transcribeFile(
       timestamp: s.startSecond * 1000,
       durationMillis: (s.endSecond - s.startSecond) * 1000
     })),
-    language: result.language,
+    language: result.language ?? null,
     audioDurationMillis: (result.durationInSeconds ?? 0) * 1000
   }
 }
@@ -79,33 +81,30 @@ export async function deleteTranscriptById(
   await db.orm.public.Transcript.where({ id }).deleteAndCount()
 }
 
-export type UserTranscriptsPage = {
-  transcripts: SavedTranscription[]
-  nextCursor?: TranscriptsCursor
-}
-
 export async function userTranscripts(
   db: DatabaseConnection,
   userId: UserID,
   limit: number,
-  cursor?: TranscriptsCursor
-): Promise<UserTranscriptsPage> {
-  const transcripts = (
+  cursor: string | null
+): Promise<TranscriptionsPage | "invalid-cursor"> {
+  const decodedCursor = cursor ? decodeCursor(cursor) : null
+  if (decodedCursor === undefined) return "invalid-cursor"
+  const transcriptions = (
     await db.orm.public.Transcript.include("parts", (p) =>
       p.orderBy((p) => p.id.asc())
     )
       .where({ userId })
-      .where((t) => t.id.gte(cursor?.id ?? -1))
+      .where((t) => t.id.gte(decodedCursor?.id ?? -1))
       .orderBy((t) => t.id.asc())
       .limit(limit + 1)
       .all()
   ).map(savedTranscription)
 
-  if (transcripts.length < limit + 1) {
-    return { transcripts }
+  if (transcriptions.length < limit + 1) {
+    return { transcriptions, nextCursor: null }
   } else {
-    const lastId = transcripts.pop()?.id ?? -1
-    return { transcripts, nextCursor: { id: lastId } }
+    const lastId = transcriptions.pop()?.id ?? -1
+    return { transcriptions, nextCursor: encodeCursor({ id: lastId }) }
   }
 }
 
@@ -119,7 +118,7 @@ function savedTranscription(
     createdAt: new Date(transcription.createdAt),
     updatedAt: new Date(transcription.updatedAt),
     audioDurationMillis: transcription.audioDurationMillis,
-    language: transcription.language ?? undefined,
+    language: transcription.language,
     filename: transcription.filename,
     model: transcription.model as TranscriptionModelID,
     userId: transcription.userId,
