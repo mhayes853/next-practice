@@ -1,3 +1,6 @@
+import { Button } from "@/components/Button"
+import { TranscriptionCard } from "@/components/TranscriptionCard"
+import { useUserTranscriptions } from "@/lib/client/api"
 import { authenticatedGetServerSideProps } from "@/lib/server/auth"
 import { userTranscriptions } from "@/lib/server/transcription"
 import {
@@ -6,6 +9,7 @@ import {
 } from "@/lib/transcription"
 import { db } from "@/prisma/db"
 import { Session } from "next-auth"
+import { signOut } from "next-auth/react"
 
 export type HomeProps = {
   session: Session
@@ -29,10 +33,31 @@ export const getServerSideProps = authenticatedGetServerSideProps(
 )
 
 export default function Home({ session, initialPage }: HomeProps) {
+  const transcriptions = useUserTranscriptions(initialPage)
+
+  if (transcriptions.isLoading) {
+    return <div>Loading...</div>
+  }
+
   return (
-    <main>
-      <h1>Welcome, {session.user.name}</h1>
-      <p>{initialPage.transcriptions.length} Transcripts</p>
+    <main className="h-screen w-screen">
+      <div className="flex flex-col items-center justify-center ">
+        <div className="w-180 mt-16">
+          <b className="text-3xl">Welcome, {session.user.name}</b>
+          <div className="flex flex-row gap-4 items-center mt-4">
+            <Button onClick={() => {}}>+ New Transcription</Button>
+            <Button kind="secondary" onClick={() => signOut()}>
+              Sign Out
+            </Button>
+          </div>
+          {transcriptions.data?.map((page) => {
+            if (page.status !== 200) return null
+            return page.data.transcriptions.map((t) => (
+              <TranscriptionCard key={t.id} transcription={t} />
+            ))
+          })}
+        </div>
+      </div>
     </main>
   )
 }
