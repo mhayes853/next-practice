@@ -1,6 +1,7 @@
 import { Button } from "@/components/Button"
 import { Modal } from "@/components/Modal"
 import { TranscriptionCard } from "@/components/TranscriptionCard"
+import { UploadForm } from "@/components/UploadForm"
 import { useUserTranscriptions } from "@/lib/client/api"
 import { authenticatedGetServerSideProps } from "@/lib/server/auth"
 import { userTranscriptions } from "@/lib/server/transcription"
@@ -63,7 +64,7 @@ export default function Home({ session, initialPage }: HomeProps) {
         isOpen={isPresentingUpload}
         onClose={() => setIsPresentingUpload(false)}
       >
-        TODO
+        <UploadForm />
       </Modal>
     </div>
   )
