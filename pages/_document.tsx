@@ -5,8 +5,14 @@ export default function Document() {
     <Html lang="en">
       <Head />
       <body className="antialiased">
-        <Main />
-        <NextScript />
+        <main className="h-screen w-screen">
+          <div className="flex flex-col items-center justify-center ">
+            <div className="w-180 mt-16">
+              <Main />
+              <NextScript />
+            </div>
+          </div>
+        </main>
       </body>
     </Html>
   )

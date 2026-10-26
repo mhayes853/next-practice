@@ -40,24 +40,20 @@ export default function Home({ session, initialPage }: HomeProps) {
   }
 
   return (
-    <main className="h-screen w-screen">
-      <div className="flex flex-col items-center justify-center ">
-        <div className="w-180 mt-16">
-          <b className="text-3xl">Welcome, {session.user.name}</b>
-          <div className="flex flex-row gap-4 items-center mt-4">
-            <Button onClick={() => {}}>+ New Transcription</Button>
-            <Button kind="secondary" onClick={() => signOut()}>
-              Sign Out
-            </Button>
-          </div>
-          {transcriptions.data?.map((page) => {
-            if (page.status !== 200) return null
-            return page.data.transcriptions.map((t) => (
-              <TranscriptionCard key={t.id} transcription={t} />
-            ))
-          })}
-        </div>
+    <div className="flex flex-col">
+      <b className="text-3xl">Welcome, {session.user.name}</b>
+      <div className="flex flex-row gap-4 items-center mt-4">
+        <Button onClick={() => {}}>+ New Transcription</Button>
+        <Button kind="secondary" onClick={() => signOut()}>
+          Sign Out
+        </Button>
       </div>
-    </main>
+      {transcriptions.data?.map((page) => {
+        if (page.status !== 200) return null
+        return page.data.transcriptions.map((t) => (
+          <TranscriptionCard key={t.id} transcription={t} />
+        ))
+      })}
+    </div>
   )
 }
