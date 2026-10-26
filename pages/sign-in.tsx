@@ -1,16 +1,21 @@
 import { Button } from "@/components/Button"
 import { signIn } from "next-auth/react"
-import { redirect } from "next/navigation"
 
 export default function SignIn() {
   return (
-    <Button
-      onClick={async () => {
-        const resp = await signIn("github")
-        if (resp?.ok) redirect("/")
-      }}
-    >
-      Sign in with GitHub
-    </Button>
+    <main className="h-screen w-screen">
+      <div className="flex flex-col items-center justify-center ">
+        <div className="w-180 mt-16 flex flex-col">
+          <b className="text-2xl">You need to sign in to continue.</b>
+          <div className="mt-4">
+            <Button
+              onClick={async () => await signIn("github", { callbackUrl: "/" })}
+            >
+              Sign in with GitHub
+            </Button>
+          </div>
+        </div>
+      </div>
+    </main>
   )
 }

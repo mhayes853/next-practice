@@ -20,6 +20,7 @@ const TEXT_COLORS = {
 } as const
 
 export const Button = ({ onClick, disabled, children, kind }: ButtonProps) => {
+  const actualKind = kind ?? "primary"
   return (
     <button
       onClick={onClick}
@@ -29,8 +30,8 @@ export const Button = ({ onClick, disabled, children, kind }: ButtonProps) => {
         transition duration-200 ease-in-out
         hover:opacity-80
         active:scale-95
-        ${TEXT_COLORS[kind ?? "primary"]}
-        ${BACKGROUNDS[kind ?? "primary"]}
+        ${TEXT_COLORS[actualKind]}
+        ${BACKGROUNDS[actualKind]}
       `}
     >
       {children}
