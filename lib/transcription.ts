@@ -44,8 +44,8 @@ export type Transcription = z.infer<typeof TranscriptionSchema>
 export const SavedTranscriptionSchema = TranscriptionSchema.extend({
   id: TranscriptionIDSchema,
   userId: UserIDSchema,
-  createdAt: z.date(),
-  updatedAt: z.date()
+  createdAt: z.iso.datetime().pipe(z.coerce.date()),
+  updatedAt: z.iso.datetime().pipe(z.coerce.date())
 })
 
 export type SavedTranscription = z.infer<typeof SavedTranscriptionSchema>
@@ -74,3 +74,5 @@ export const TranscriptionsPageSchema = z.object({
 })
 
 export type TranscriptionsPage = z.infer<typeof TranscriptionsPageSchema>
+
+export const DEFAULT_TRANSCRIPTIONS_PAGE_LIMIT = 10

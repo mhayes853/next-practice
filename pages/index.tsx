@@ -1,10 +1,11 @@
 import { authenticatedGetServerSideProps } from "@/lib/server/auth"
 import { userTranscriptions } from "@/lib/server/transcription"
-import { TranscriptionsPage } from "@/lib/transcription"
+import {
+  DEFAULT_TRANSCRIPTIONS_PAGE_LIMIT,
+  TranscriptionsPage
+} from "@/lib/transcription"
 import { db } from "@/prisma/db"
 import { Session } from "next-auth"
-
-const LIMIT = 10
 
 export type HomeProps = {
   session: Session
@@ -19,7 +20,7 @@ export const getServerSideProps = authenticatedGetServerSideProps(
         initialPage: (await userTranscriptions(
           db,
           context.session.user.id,
-          LIMIT,
+          DEFAULT_TRANSCRIPTIONS_PAGE_LIMIT,
           null
         )) as TranscriptionsPage // NB: Safe because null is always a valid cursor
       }
