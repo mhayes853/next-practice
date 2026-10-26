@@ -1,4 +1,4 @@
-import useSWR, { useSWRConfig } from "swr"
+import useSWR, { ScopedMutator, useSWRConfig } from "swr"
 import {
   DEFAULT_TRANSCRIPTIONS_PAGE_LIMIT,
   SavedTranscriptionSchema,
@@ -11,6 +11,7 @@ import useSWRInfinite, { unstable_serialize } from "swr/infinite"
 import { zodFetcher } from "./zod-fetcher"
 import z from "zod"
 import { useCallback, useEffect } from "react"
+import useSWRMutation from "swr/mutation"
 
 const ERROR_RESPONSES = {
   404: z.object({ error: z.literal("not found") }),
@@ -25,24 +26,19 @@ const transcriptionsPageFetcher = zodFetcher({
 })
 
 function userTranscriptionsKey(
-  limit: number,
   previous?: Awaited<ReturnType<typeof transcriptionsPageFetcher>>
 ) {
+  const limit = DEFAULT_TRANSCRIPTIONS_PAGE_LIMIT
+
   if (!previous) return `/api/transcript?limit=${limit}`
   if (previous.status !== 200 || !previous.data.nextCursor) return null
   return `/api/transcript?limit=${limit}&cursor=${previous.data.nextCursor}`
 }
 
-export function useUserTranscriptions(
-  initialPage?: TranscriptionsPage,
-  limit: number = DEFAULT_TRANSCRIPTIONS_PAGE_LIMIT
-) {
+export function useUserTranscriptions(initialPage?: TranscriptionsPage) {
   const { mutate } = useSWRConfig()
   const result = useSWRInfinite(
-    useCallback(
-      (_, previous) => userTranscriptionsKey(limit, previous),
-      [limit]
-    ),
+    useCallback((_, previous) => userTranscriptionsKey(previous), []),
     transcriptionsPageFetcher,
     {
       revalidateAll: true,
@@ -82,49 +78,61 @@ export function useTranscription(id: TranscriptionID) {
   return useSWR(transcriptionKey(id), transcriptionFetcher)
 }
 
-export function useTranscribe(
-  modelId: TranscriptionModelID,
-  file: File,
-  userLimit: number = DEFAULT_TRANSCRIPTIONS_PAGE_LIMIT
-) {
+export function useTranscribe() {
   const { mutate } = useSWRConfig()
-  return useCallback(async () => {
-    const formData = new FormData()
-    formData.set("model", modelId)
-    formData.set("attachments", file)
+  return useSWRMutation(
+    "/api/transcript",
+    async (
+      url,
+      { arg }: { arg: { modelId: TranscriptionModelID; file: File } }
+    ) => {
+      const formData = new FormData()
+      formData.set("model", arg.modelId)
+      formData.set("attachments", arg.file)
 
-    const response = await fetch("/api/transcript", {
-      method: "POST",
-      body: formData
-    })
-    if (response.status !== 201) return
-    const result = await SavedTranscriptionSchema.parseAsync(
-      await response.json()
-    )
+      const response = await fetch(url, { method: "POST", body: formData })
 
-    mutate(
-      transcriptionKey(result.id),
-      { status: 200, data: result },
-      { revalidate: false }
-    )
-    mutate(
-      unstable_serialize((_, prev) => userTranscriptionsKey(userLimit, prev))
-    )
-    return result
-  }, [modelId, file, mutate, userLimit])
+      if (!response.ok) {
+        throw new Error(`Transcription failed: ${response.status}`)
+      }
+
+      if (response.status !== 201) {
+        throw new Error(`Unexpected status: ${response.status}`)
+      }
+
+      return await SavedTranscriptionSchema.parseAsync(await response.json())
+    },
+    {
+      populateCache: false,
+      revalidate: false,
+      onSuccess: async (result) => {
+        await mutate(
+          transcriptionKey(result.id),
+          { status: 200, data: result },
+          { revalidate: false }
+        )
+        invalidateTranscriptions(mutate)
+      }
+    }
+  )
 }
 
-export function useTranscriptionDeletion(
-  id: TranscriptionID,
-  userLimit: number = DEFAULT_TRANSCRIPTIONS_PAGE_LIMIT
-) {
+export function useTranscriptionDeletion(id: TranscriptionID) {
   const { mutate } = useSWRConfig()
-  return useCallback(async () => {
-    const response = await fetch(`/api/transcript/${id}`, { method: "DELETE" })
-    if (response.status !== 204) return
-    mutate(transcriptionKey(id))
-    mutate(
-      unstable_serialize((_, prev) => userTranscriptionsKey(userLimit, prev))
-    )
-  }, [id, mutate, userLimit])
+  return useSWRMutation(
+    transcriptionKey(id),
+    async () => {
+      const response = await fetch(`/api/transcript/${id}`, {
+        method: "DELETE"
+      })
+      if (response.status !== 204) {
+        throw new Error(`Unexpected status: ${response.status}`)
+      }
+    },
+    { onSuccess: () => invalidateTranscriptions(mutate) }
+  )
+}
+
+function invalidateTranscriptions(mutate: ScopedMutator) {
+  mutate(unstable_serialize((_, prev) => userTranscriptionsKey(prev)))
 }
