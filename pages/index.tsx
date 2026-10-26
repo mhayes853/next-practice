@@ -1,4 +1,5 @@
 import { Button } from "@/components/Button"
+import { Modal } from "@/components/Modal"
 import { TranscriptionCard } from "@/components/TranscriptionCard"
 import { useUserTranscriptions } from "@/lib/client/api"
 import { authenticatedGetServerSideProps } from "@/lib/server/auth"
@@ -10,6 +11,7 @@ import {
 import { db } from "@/prisma/db"
 import { Session } from "next-auth"
 import { signOut } from "next-auth/react"
+import { useState } from "react"
 
 export type HomeProps = {
   session: Session
@@ -34,6 +36,7 @@ export const getServerSideProps = authenticatedGetServerSideProps(
 
 export default function Home({ session, initialPage }: HomeProps) {
   const transcriptions = useUserTranscriptions(initialPage)
+  const [isPresentingUpload, setIsPresentingUpload] = useState(false)
 
   if (transcriptions.isLoading) {
     return <div>Loading...</div>
@@ -43,7 +46,9 @@ export default function Home({ session, initialPage }: HomeProps) {
     <div className="flex flex-col">
       <b className="text-3xl">Welcome, {session.user.name}</b>
       <div className="flex flex-row gap-4 items-center mt-4">
-        <Button onClick={() => {}}>+ New Transcription</Button>
+        <Button onClick={() => setIsPresentingUpload(true)}>
+          + New Transcription
+        </Button>
         <Button kind="secondary" onClick={() => signOut()}>
           Sign Out
         </Button>
@@ -54,6 +59,12 @@ export default function Home({ session, initialPage }: HomeProps) {
           <TranscriptionCard key={t.id} transcription={t} />
         ))
       })}
+      <Modal
+        isOpen={isPresentingUpload}
+        onClose={() => setIsPresentingUpload(false)}
+      >
+        TODO
+      </Modal>
     </div>
   )
 }
