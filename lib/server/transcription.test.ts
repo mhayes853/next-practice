@@ -65,7 +65,6 @@ describe("transcription tests", () => {
   it("should return an invalid cursor when the cursor is invalid", async () => {
     const user = await testUser()
     const t1 = await userTranscriptions(db, user.id, 1, "blob")
-    // console.log(t1)
     expect(t1).toEqual("invalid-cursor")
   })
 
