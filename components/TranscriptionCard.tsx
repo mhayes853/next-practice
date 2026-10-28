@@ -24,7 +24,7 @@ function label(transcription: SavedTranscription) {
   const { minutes, seconds } = durationComponents(
     transcription.audioDurationMillis
   )
-  return `${language} (${minutes}:${seconds < 10 ? "0" : ""}${Math.floor(seconds)})`
+  return `${language} (${minutes}:${seconds < 10 ? "0" : ""}${seconds})`
 }
 
 export function TranscriptionCard({ transcription }: TranscriptionCardProps) {

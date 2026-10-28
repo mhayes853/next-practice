@@ -18,6 +18,6 @@ export type DurationComponents = {
 
 export function durationComponents(millis: number): DurationComponents {
   const minutes = Math.floor(millis / 1000 / 60)
-  const seconds = (millis / 1000) % 60
+  const seconds = Math.floor((millis / 1000) % 60)
   return { minutes, seconds }
 }
