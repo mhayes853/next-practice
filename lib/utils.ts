@@ -8,3 +8,5 @@ export function base64URLDecode(input: string) {
 export function base64URLEncode(input: string) {
   return btoa(input).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "")
 }
+
+export type Unsubscribe = () => void

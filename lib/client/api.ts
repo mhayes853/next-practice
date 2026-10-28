@@ -1,6 +1,7 @@
 import useSWR, { ScopedMutator, useSWRConfig } from "swr"
 import {
   DEFAULT_TRANSCRIPTIONS_PAGE_LIMIT,
+  SavedTranscription,
   SavedTranscriptionSchema,
   TranscriptionID,
   TranscriptionModelID,
@@ -78,7 +79,11 @@ export function useTranscription(id: TranscriptionID) {
   return useSWR(transcriptionKey(id), transcriptionFetcher)
 }
 
-export function useTranscribe() {
+export type UseTranscribeArgs = {
+  onSuccess?: (result: SavedTranscription) => void
+}
+
+export function useTranscribe({ onSuccess }: UseTranscribeArgs = {}) {
   const { mutate } = useSWRConfig()
   return useSWRMutation(
     "/api/transcript",
@@ -112,6 +117,7 @@ export function useTranscribe() {
           { revalidate: false }
         )
         invalidateTranscriptions(mutate)
+        onSuccess?.(result)
       }
     }
   )

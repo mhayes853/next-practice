@@ -1,13 +1,27 @@
 import { useTranscribe } from "@/lib/client/api"
 import { TRANSCRIPTION_MODELS, TranscriptionModelID } from "@/lib/transcription"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Button } from "./Button"
+import { useModal } from "./Modal"
 
 export function UploadForm() {
-  const upload = useTranscribe()
+  const { subscribe, close } = useModal()
+
+  const upload = useTranscribe({ onSuccess: () => close() })
   const [selectedModel, setSelectedModel] =
     useState<TranscriptionModelID>("whisper1")
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [file, setFile] = useState<File | undefined>(undefined)
+
+  useEffect(() => {
+    return subscribe((isOpen) => {
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""
+      }
+      upload.reset()
+      if (!isOpen) setFile(undefined)
+    })
+  }, [subscribe, upload])
 
   return (
     <div className="flex flex-col gap-8">
@@ -24,7 +38,11 @@ export function UploadForm() {
           </option>
         ))}
       </select>
-      <input type="file" onChange={(e) => setFile(e.target.files?.[0])} />
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={(e) => setFile(e.target.files?.[0])}
+      />
       {upload.error && (
         <div className="text-red-500">{upload.error.message}</div>
       )}

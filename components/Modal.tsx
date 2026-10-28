@@ -1,5 +1,29 @@
-import { ReactNode } from "react"
+import {
+  ReactNode,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef
+} from "react"
 import { Button } from "./Button"
+import { Unsubscribe } from "@/lib/utils"
+
+export type ModalSubscribe = (isOpen: boolean) => void
+
+export type ModalValues = {
+  isOpen: boolean
+  subscribe: (fn: ModalSubscribe) => Unsubscribe
+  close: () => void
+}
+
+const ModalContext = createContext<ModalValues | undefined>(undefined)
+
+export function useModal() {
+  const context = useContext(ModalContext)
+  if (!context) throw new Error("useModal must be used within a Modal")
+  return context
+}
 
 export type ModalProps = {
   isOpen: boolean
@@ -8,6 +32,16 @@ export type ModalProps = {
 }
 
 export function Modal({ isOpen, onClose, children }: ModalProps) {
+  const callbacks = useRef(new Set<(isOpen: boolean) => void>())
+  const subscribe = useCallback((fn: ModalSubscribe) => {
+    callbacks.current.add(fn)
+    return () => callbacks.current.delete(fn)
+  }, [])
+
+  useEffect(() => {
+    callbacks.current.forEach((fn) => fn(isOpen))
+  }, [isOpen])
+
   return (
     <div
       data-open={isOpen}
@@ -35,7 +69,9 @@ export function Modal({ isOpen, onClose, children }: ModalProps) {
               X
             </Button>
           </div>
-          {children}
+          <ModalContext.Provider value={{ isOpen, close: onClose, subscribe }}>
+            {children}
+          </ModalContext.Provider>
         </div>
       </div>
     </div>
