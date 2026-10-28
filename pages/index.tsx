@@ -72,8 +72,6 @@ export default function Home({ session, initialPage }: HomeProps) {
     transcriptions.data[0].status === 200 &&
     transcriptions.data[0].data.transcriptions.length > 0
 
-  console.log(transcriptions.data)
-
   return (
     <div className="flex flex-col">
       <b className="text-3xl">Welcome, {session.user.name}</b>
