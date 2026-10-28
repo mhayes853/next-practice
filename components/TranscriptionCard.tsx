@@ -1,8 +1,8 @@
 import { useTranscriptionDeletion } from "@/lib/client/api"
 import { SavedTranscription } from "@/lib/transcription"
-import { Button } from "./Button"
+import { Button, LabelButton } from "./Button"
 import Link from "next/link"
-import { TrashCan } from "./Icons"
+import { Ellipsis } from "./Icons"
 import { Modal } from "./Modal"
 import { useState } from "react"
 import { Spinner } from "./Spinner"
@@ -30,16 +30,12 @@ export function TranscriptionCard({ transcription }: TranscriptionCardProps) {
           {transcriptionLabel(transcription)}
         </p>
       </div>
-      <Button
-        kind="danger"
+      <LabelButton
         disabled={deletion.isMutating}
         onClick={() => setIsShowingConfirmation(true)}
       >
-        <div className="flex flex-row items-center gap-2">
-          {deletion.isMutating ? <Spinner /> : <TrashCan />}
-          Delete
-        </div>
-      </Button>
+        {deletion.isMutating ? <Spinner /> : <Ellipsis />}
+      </LabelButton>
       <Modal
         isOpen={isShowingConfirmation}
         onClose={() => setIsShowingConfirmation(false)}

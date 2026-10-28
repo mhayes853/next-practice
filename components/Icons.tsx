@@ -63,3 +63,20 @@ export function TrashCan() {
     </svg>
   )
 }
+
+export function Ellipsis() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      className="h-5 w-5 shrink-0"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <circle cx="5" cy="12" r="2" />
+      <circle cx="12" cy="12" r="2" />
+      <circle cx="19" cy="12" r="2" />
+    </svg>
+  )
+}

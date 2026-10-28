@@ -13,6 +13,7 @@ import { zodFetcher } from "./zod-fetcher"
 import z from "zod"
 import { useCallback, useEffect } from "react"
 import useSWRMutation from "swr/mutation"
+import { sleep } from "../utils"
 
 const ERROR_RESPONSES = {
   404: z.object({ error: z.literal("not found") }),
@@ -135,6 +136,7 @@ export function useTranscriptionDeletion(id: TranscriptionID) {
   return useSWRMutation(
     transcriptionKey(id),
     async () => {
+      await sleep(2000)
       const response = await fetch(`/api/transcript/${id}`, {
         method: "DELETE"
       })

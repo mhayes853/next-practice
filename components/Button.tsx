@@ -48,25 +48,56 @@ export const Button = ({ onClick, disabled, children, kind }: ButtonProps) => {
   )
 }
 
+export type LabelButtonProps = {
+  disabled?: boolean
+  onClick?: () => void
+  children: ReactNode
+  className?: string
+  ariaLabel?: string
+}
+
+export function LabelButton({
+  onClick,
+  children,
+  disabled,
+  className,
+  ariaLabel
+}: LabelButtonProps) {
+  return (
+    <button
+      aria-label={ariaLabel}
+      className={`
+        ${className ?? ""} flex size-12 items-center justify-center
+        rounded-full text-zinc-500 transition cursor-pointer
+        active:scale-90 focus-visible:outline-none focus-visible:ring-2
+        focus-visible:ring-indigo-500 focus-visible:ring-offset-2
+        ${
+          disabled
+            ? "opacity-50 cursor-not-allowed"
+            : "hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-100 dark:focus-visible:ring-offset-zinc-900"
+        }`}
+      onClick={onClick}
+      disabled={disabled}
+    >
+      {children}
+    </button>
+  )
+}
+
 export type CloseButtonProps = {
   onClick?: () => void
 }
 
 export function CloseButton({ onClick }: CloseButtonProps) {
   return (
-    <button
-      aria-label="Close"
-      className="group absolute right-3 top-3 inline-flex size-12 items-center justify-center
-                     rounded-full text-zinc-500 transition cursor-pointer
-                     hover:bg-zinc-100 hover:text-zinc-900 active:scale-90
-                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500
-                     focus-visible:ring-offset-2
-                     dark:hover:bg-zinc-800 dark:hover:text-zinc-100 dark:focus-visible:ring-offset-zinc-900"
+    <LabelButton
       onClick={onClick}
+      className="group absolute right-3 top-3 inline-flex"
+      ariaLabel="Close"
     >
       <div className="shrink-0 transition-transform duration-200 group-hover:rotate-90">
         <XMark />
       </div>
-    </button>
+    </LabelButton>
   )
 }
