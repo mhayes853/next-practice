@@ -11,17 +11,6 @@ export function base64URLEncode(input: string) {
 
 export type Unsubscribe = () => void
 
-export type DurationComponents = {
-  minutes: number
-  seconds: number
-}
-
-export function durationComponents(millis: number): DurationComponents {
-  const minutes = Math.floor(millis / 1000 / 60)
-  const seconds = Math.floor((millis / 1000) % 60)
-  return { minutes, seconds }
-}
-
 export function sleep(ms: number, signal?: AbortSignal): Promise<void> {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {

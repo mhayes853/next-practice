@@ -13,7 +13,6 @@ import { zodFetcher } from "./zod-fetcher"
 import z from "zod"
 import { useCallback, useEffect } from "react"
 import useSWRMutation from "swr/mutation"
-import { sleep } from "../utils"
 
 const ERROR_RESPONSES = {
   404: z.object({ error: z.literal("not found") }),

@@ -1,5 +1,5 @@
+import { formattedDuration } from "../duration-components"
 import { SavedTranscription } from "../transcription"
-import { durationComponents } from "../utils"
 
 const LANGUAGE_MAP: Record<string, string> = {
   en: "English",
@@ -13,8 +13,5 @@ export function transcriptionLabel(
   const language = transcription.language
     ? (LANGUAGE_MAP[transcription.language] ?? transcription.language)
     : "Unknown"
-  const { minutes, seconds } = durationComponents(
-    transcription.audioDurationMillis
-  )
-  return `${language} (${minutes}:${seconds < 10 ? "0" : ""}${seconds})`
+  return `${language} (${formattedDuration(transcription.audioDurationMillis)})`
 }

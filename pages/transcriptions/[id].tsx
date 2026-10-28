@@ -1,5 +1,6 @@
 import { Divider } from "@/components/Divider"
 import { Spinner } from "@/components/Spinner"
+import { TranscriptionSegmentRow } from "@/components/TranscriptionSegmentRow"
 import { useTranscription } from "@/lib/client/api"
 import { transcriptionLabel } from "@/lib/client/transcription"
 import { authenticatedGetServerSideProps } from "@/lib/server/auth"
@@ -8,11 +9,9 @@ import {
   deserialize,
   SavedTranscription,
   serialize,
-  SerializeableTranscription,
-  TranscriptionID
+  SerializeableTranscription
 } from "@/lib/transcription"
 import { db } from "@/prisma/db"
-import { useRouter } from "next/router"
 import { z } from "zod"
 
 const QuerySchema = z.object({
@@ -57,7 +56,18 @@ function TranscriptionDetail({ transcription }: TranscriptionDetailProps) {
       </div>
       <Divider />
 
-      <b className="text-xl">Segments</b>
+      <div className="flex flex-col gap-4">
+        <b className="text-xl">Segments</b>
+        {transcription.segments.length > 0 ? (
+          <div className="flex flex-col gap-2">
+            {transcription.segments.map((segment, i) => (
+              <TranscriptionSegmentRow key={i} segment={segment} />
+            ))}
+          </div>
+        ) : (
+          <p>No segments for this audio.</p>
+        )}
+      </div>
     </div>
   )
 }
