@@ -17,6 +17,7 @@
     "formidable": "^3.5.4",
     "next": "16.4.2",
     "next-auth": "4",
+    "next-superjson-plugin": "^0.6.3",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "swr": "^2.5.1",

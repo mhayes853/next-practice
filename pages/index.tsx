@@ -8,6 +8,9 @@ import { authenticatedGetServerSideProps } from "@/lib/server/auth"
 import { userTranscriptions } from "@/lib/server/transcription"
 import {
   DEFAULT_TRANSCRIPTIONS_PAGE_LIMIT,
+  deserialize,
+  serialize,
+  SerializeableTranscription,
   TranscriptionsPage
 } from "@/lib/transcription"
 import { db } from "@/prisma/db"
@@ -17,32 +20,59 @@ import { useState } from "react"
 
 export type HomeProps = {
   session: Session
-  initialPage: TranscriptionsPage
+  initialPage: Omit<TranscriptionsPage, "transcriptions"> & {
+    transcriptions: SerializeableTranscription[]
+  }
 }
 
 export const getServerSideProps = authenticatedGetServerSideProps(
   async (context) => {
+    const page = await userTranscriptions(
+      db,
+      context.session.user.id,
+      DEFAULT_TRANSCRIPTIONS_PAGE_LIMIT,
+      null
+    )
+    if (page === "invalid-cursor") {
+      return {
+        props: {
+          session: context.session,
+          initialPage: { transcriptions: [] as SerializeableTranscription[] }
+        }
+      }
+    }
     return {
       props: {
         session: context.session,
-        initialPage: (await userTranscriptions(
-          db,
-          context.session.user.id,
-          DEFAULT_TRANSCRIPTIONS_PAGE_LIMIT,
-          null
-        )) as TranscriptionsPage // NB: Safe because null is always a valid cursor
+        initialPage: {
+          ...page,
+          transcriptions: page.transcriptions.map(serialize)
+        }
       }
     }
   }
 )
 
 export default function Home({ session, initialPage }: HomeProps) {
-  const transcriptions = useUserTranscriptions(initialPage)
+  const deserializedInitialPage = initialPage
+    ? {
+        ...initialPage,
+        transcriptions: initialPage.transcriptions.map(deserialize)
+      }
+    : undefined
+  const transcriptions = useUserTranscriptions(deserializedInitialPage)
   const [isPresentingUpload, setIsPresentingUpload] = useState(false)
 
   if (transcriptions.isLoading) {
     return <div>Loading...</div>
   }
+
+  const hasTranscriptions =
+    transcriptions.data &&
+    transcriptions.data[0].status === 200 &&
+    transcriptions.data[0].data.transcriptions.length > 0
+
+  console.log(transcriptions.data)
 
   return (
     <div className="flex flex-col">
@@ -57,12 +87,21 @@ export default function Home({ session, initialPage }: HomeProps) {
           Sign Out
         </Button>
       </div>
-      {transcriptions.data?.map((page) => {
-        if (page.status !== 200) return null
-        return page.data.transcriptions.map((t) => (
-          <TranscriptionCard key={t.id} transcription={t} />
-        ))
-      })}
+      <div className="flex flex-col gap-4 pt-16">
+        <b className={`text-xl ${hasTranscriptions ? "pl-4" : ""}`}>
+          Transcriptions
+        </b>
+        {hasTranscriptions ? (
+          transcriptions.data?.map((page) => {
+            if (page.status !== 200) return null
+            return page.data.transcriptions.map((t) => (
+              <TranscriptionCard key={t.id} transcription={t} />
+            ))
+          })
+        ) : (
+          <p>No transcriptions yet.</p>
+        )}
+      </div>
       <Modal
         isOpen={isPresentingUpload}
         onClose={() => setIsPresentingUpload(false)}

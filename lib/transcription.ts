@@ -50,6 +50,34 @@ export const SavedTranscriptionSchema = TranscriptionSchema.extend({
 
 export type SavedTranscription = z.infer<typeof SavedTranscriptionSchema>
 
+export type SerializeableTranscription = Omit<
+  SavedTranscription,
+  "createdAt" | "updatedAt"
+> & {
+  createdAt: string
+  updatedAt: string
+}
+
+export function serialize(
+  transcription: SavedTranscription
+): SerializeableTranscription {
+  return {
+    ...transcription,
+    createdAt: transcription.createdAt.toISOString(),
+    updatedAt: transcription.updatedAt.toISOString()
+  }
+}
+
+export function deserialize(
+  transcription: SerializeableTranscription
+): SavedTranscription {
+  return {
+    ...transcription,
+    createdAt: new Date(transcription.createdAt),
+    updatedAt: new Date(transcription.updatedAt)
+  }
+}
+
 export type TranscriptionsCursor = {
   id: TranscriptionID
 }

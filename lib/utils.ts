@@ -10,3 +10,14 @@ export function base64URLEncode(input: string) {
 }
 
 export type Unsubscribe = () => void
+
+export type DurationComponents = {
+  minutes: number
+  seconds: number
+}
+
+export function durationComponents(millis: number): DurationComponents {
+  const minutes = Math.floor(millis / 1000 / 60)
+  const seconds = (millis / 1000) % 60
+  return { minutes, seconds }
+}

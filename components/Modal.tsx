@@ -68,12 +68,16 @@ export function Modal({ isOpen, onClose, children }: ModalProps) {
         "
       >
         <div className="flex flex-col">
-          <div className="flex justify-end">
+          <div className="flex flex-row justify-end">
             <CloseButton onClick={onClose} />
           </div>
-          <ModalContext.Provider value={{ isOpen, close: onClose, subscribe }}>
-            {children}
-          </ModalContext.Provider>
+          <div className="flex flex-col gap-4 mt-8">
+            <ModalContext.Provider
+              value={{ isOpen, close: onClose, subscribe }}
+            >
+              {children}
+            </ModalContext.Provider>
+          </div>
         </div>
       </div>
     </div>
