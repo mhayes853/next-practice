@@ -131,7 +131,14 @@ export function useTranscribe({ onSuccess }: UseTranscribeArgs = {}) {
   )
 }
 
-export function useTranscriptionDeletion(id: TranscriptionID) {
+export type UseTranscriptionDeletionArgs = {
+  onSuccess?: () => void
+}
+
+export function useTranscriptionDeletion(
+  id: TranscriptionID,
+  { onSuccess }: UseTranscriptionDeletionArgs = {}
+) {
   const { mutate } = useSWRConfig()
   return useSWRMutation(
     transcriptionKey(id),
@@ -144,7 +151,12 @@ export function useTranscriptionDeletion(id: TranscriptionID) {
         throw new Error(`Unexpected status: ${response.status}`)
       }
     },
-    { onSuccess: () => invalidateTranscriptions(mutate) }
+    {
+      onSuccess: () => {
+        invalidateTranscriptions(mutate)
+        onSuccess?.()
+      }
+    }
   )
 }
 

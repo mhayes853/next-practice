@@ -1,8 +1,10 @@
 import { Divider } from "@/components/Divider"
 import { Spinner } from "@/components/Spinner"
+import { TranscriptionMenu } from "@/components/TranscriptionMenu"
 import { TranscriptionSegmentRow } from "@/components/TranscriptionSegmentRow"
 import { useTranscription } from "@/lib/client/api"
 import { transcriptionLabel } from "@/lib/client/transcription"
+import { useLastDefinedValue } from "@/lib/client/use-last-defined-value"
 import { authenticatedGetServerSideProps } from "@/lib/server/auth"
 import { transcriptionWithId } from "@/lib/server/transcription"
 import {
@@ -12,6 +14,7 @@ import {
   SerializeableTranscription
 } from "@/lib/transcription"
 import { db } from "@/prisma/db"
+import { useRouter } from "next/router"
 import { z } from "zod"
 
 const QuerySchema = z.object({
@@ -35,9 +38,14 @@ export default function TranscriptionPage({
   initialTranscription
 }: TranscriptionPageProps) {
   const transcription = useTranscription(deserialize(initialTranscription))
+  const transcriptionDetail = useLastDefinedValue(
+    transcription.data && transcription.data.status === 200
+      ? transcription.data.data
+      : undefined
+  )
   if (transcription.isLoading) return <Spinner />
-  return transcription.data && transcription.data.status === 200 ? (
-    <TranscriptionDetail transcription={transcription.data.data} />
+  return transcriptionDetail ? (
+    <TranscriptionDetail transcription={transcriptionDetail} />
   ) : (
     <b className="text-red-500">An error occurred.</b>
   )
@@ -48,11 +56,18 @@ type TranscriptionDetailProps = {
 }
 
 function TranscriptionDetail({ transcription }: TranscriptionDetailProps) {
+  const router = useRouter()
   return (
     <div className="flex flex-col gap-8">
-      <div className="flex flex-col">
-        <b className="text-2xl">{transcription.filename}</b>
-        <p className="text-lg">{transcriptionLabel(transcription)}</p>
+      <div className="flex flex-row justify-between items-center">
+        <div className="flex flex-col">
+          <b className="text-2xl">{transcription.filename}</b>
+          <p className="text-lg">{transcriptionLabel(transcription)}</p>
+        </div>
+        <TranscriptionMenu
+          id={transcription.id}
+          onDeleteSuccess={() => router.replace("/")}
+        />
       </div>
       <Divider />
 
