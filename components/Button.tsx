@@ -67,10 +67,9 @@ export function LabelButton({
     <button
       aria-label={ariaLabel}
       className={`
-        ${className ?? ""} flex size-12 items-center justify-center
-        rounded-full text-zinc-500 transition cursor-pointer
-        active:scale-90 focus-visible:outline-none focus-visible:ring-2
-        focus-visible:ring-indigo-500 focus-visible:ring-offset-2
+        ${className ?? ""} flex w-full items-center justify-center
+        rounded-md text-zinc-500 transition cursor-pointer
+        active:scale-90 focus-visible:outline-none
         ${
           disabled
             ? "opacity-50 cursor-not-allowed"
@@ -79,22 +78,19 @@ export function LabelButton({
       onClick={onClick}
       disabled={disabled}
     >
-      {children}
+      <div className="flex p-3">{children}</div>
     </button>
   )
 }
 
 export type CloseButtonProps = {
   onClick?: () => void
+  className?: string
 }
 
-export function CloseButton({ onClick }: CloseButtonProps) {
+export function CloseButton({ onClick, className }: CloseButtonProps) {
   return (
-    <LabelButton
-      onClick={onClick}
-      className="group absolute right-3 top-3 inline-flex"
-      ariaLabel="Close"
-    >
+    <LabelButton onClick={onClick} className={className} ariaLabel="Close">
       <div className="shrink-0 transition-transform duration-200 group-hover:rotate-90">
         <XMark />
       </div>
