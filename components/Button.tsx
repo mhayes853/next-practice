@@ -8,6 +8,12 @@ export type ButtonProps = {
   children: ReactNode
 }
 
+const SHADOW_COLORS = {
+  primary: "shadow-white/30",
+  secondary: "shadow-gray-300/30",
+  danger: "shadow-red-300/30"
+} as const
+
 const BACKGROUNDS = {
   primary: "bg-white",
   secondary: "bg-gray-800",
@@ -27,6 +33,8 @@ export const Button = ({ onClick, disabled, children, kind }: ButtonProps) => {
       onClick={onClick}
       disabled={disabled}
       className={`
+        shadow-lg
+        ${SHADOW_COLORS[actualKind]}
         cursor-pointer rounded-xl font-bold text-lg p-2.5
         transition duration-200 ease-in-out
         hover:opacity-80
