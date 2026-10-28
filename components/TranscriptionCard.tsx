@@ -6,6 +6,7 @@ import Link from "next/link"
 import { TrashCan } from "./Icons"
 import { Modal } from "./Modal"
 import { useState } from "react"
+import { Spinner } from "./Spinner"
 
 export type TranscriptionCardProps = {
   transcription: SavedTranscription
@@ -49,7 +50,7 @@ export function TranscriptionCard({ transcription }: TranscriptionCardProps) {
         onClick={() => setIsShowingConfirmation(true)}
       >
         <div className="flex flex-row items-center gap-2">
-          <TrashCan />
+          {deletion.isMutating ? <Spinner /> : <TrashCan />}
           Delete
         </div>
       </Button>
@@ -65,8 +66,8 @@ export function TranscriptionCard({ transcription }: TranscriptionCardProps) {
             <Button
               kind="danger"
               onClick={async () => {
-                await deletion.trigger()
                 setIsShowingConfirmation(false)
+                await deletion.trigger()
               }}
             >
               <div className="px-4">Yes</div>

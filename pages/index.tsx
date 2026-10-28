@@ -1,6 +1,7 @@
 import { Button } from "@/components/Button"
 import { Plus } from "@/components/Icons"
 import { Modal } from "@/components/Modal"
+import { Spinner } from "@/components/Spinner"
 import { TranscriptionCard } from "@/components/TranscriptionCard"
 import { UploadForm } from "@/components/UploadForm"
 import { useUserTranscriptions } from "@/lib/client/api"
@@ -63,10 +64,6 @@ export default function Home({ session, initialPage }: HomeProps) {
   const transcriptions = useUserTranscriptions(deserializedInitialPage)
   const [isPresentingUpload, setIsPresentingUpload] = useState(false)
 
-  if (transcriptions.isLoading) {
-    return <div>Loading...</div>
-  }
-
   const hasTranscriptions =
     transcriptions.data &&
     transcriptions.data[0].status === 200 &&
@@ -89,6 +86,7 @@ export default function Home({ session, initialPage }: HomeProps) {
         <b className={`text-xl ${hasTranscriptions ? "pl-4" : ""}`}>
           Transcriptions
         </b>
+        {transcriptions.isLoading && <Spinner />}
         {hasTranscriptions ? (
           transcriptions.data?.map((page) => {
             if (page.status !== 200) return null

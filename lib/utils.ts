@@ -21,3 +21,17 @@ export function durationComponents(millis: number): DurationComponents {
   const seconds = Math.floor((millis / 1000) % 60)
   return { minutes, seconds }
 }
+
+export function sleep(ms: number, signal?: AbortSignal): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      resolve()
+    }, ms)
+    if (signal) {
+      signal.addEventListener("abort", () => {
+        clearTimeout(timer)
+        reject(new Error("Aborted"))
+      })
+    }
+  })
+}

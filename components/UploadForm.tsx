@@ -3,6 +3,7 @@ import { TRANSCRIPTION_MODELS, TranscriptionModelID } from "@/lib/transcription"
 import { useEffect, useRef, useState } from "react"
 import { Button } from "./Button"
 import { useModal } from "./Modal"
+import { Spinner } from "./Spinner"
 
 export function UploadForm() {
   const { subscribe, close } = useModal()
@@ -52,7 +53,10 @@ export function UploadForm() {
           disabled={upload.isMutating}
           onClick={() => upload.trigger({ modelId: selectedModel, file })}
         >
-          Upload
+          <div className="flex flex-row gap-4 items-center justify-center">
+            {upload.isMutating && <Spinner />}
+            Upload
+          </div>
         </Button>
       )}
     </div>

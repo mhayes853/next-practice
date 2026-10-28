@@ -13,6 +13,7 @@ import { zodFetcher } from "./zod-fetcher"
 import z from "zod"
 import { useCallback, useEffect } from "react"
 import useSWRMutation from "swr/mutation"
+import { sleep } from "../utils"
 
 const ERROR_RESPONSES = {
   404: z.object({ error: z.literal("not found") }),
@@ -75,8 +76,15 @@ const transcriptionFetcher = zodFetcher({
   ...ERROR_RESPONSES
 })
 
-export function useTranscription(id: TranscriptionID) {
-  return useSWR(transcriptionKey(id), transcriptionFetcher)
+export function useTranscription(value: TranscriptionID | SavedTranscription) {
+  return useSWR(
+    transcriptionKey(typeof value === "number" ? value : value.id),
+    transcriptionFetcher,
+    {
+      fallbackData:
+        typeof value === "number" ? undefined : { status: 200, data: value }
+    }
+  )
 }
 
 export type UseTranscribeArgs = {
