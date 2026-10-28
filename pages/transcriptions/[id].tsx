@@ -1,5 +1,7 @@
+import { Divider } from "@/components/Divider"
 import { Spinner } from "@/components/Spinner"
 import { useTranscription } from "@/lib/client/api"
+import { transcriptionLabel } from "@/lib/client/transcription"
 import { authenticatedGetServerSideProps } from "@/lib/server/auth"
 import { transcriptionWithId } from "@/lib/server/transcription"
 import {
@@ -48,8 +50,14 @@ type TranscriptionDetailProps = {
 
 function TranscriptionDetail({ transcription }: TranscriptionDetailProps) {
   return (
-    <div>
-      <b className="text-2xl">{transcription.filename}</b>
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-col">
+        <b className="text-2xl">{transcription.filename}</b>
+        <p className="text-lg">{transcriptionLabel(transcription)}</p>
+      </div>
+      <Divider />
+
+      <b className="text-xl">Segments</b>
     </div>
   )
 }
