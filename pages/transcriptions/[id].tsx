@@ -4,6 +4,7 @@ import { authenticatedGetServerSideProps } from "@/lib/server/auth"
 import { transcriptionWithId } from "@/lib/server/transcription"
 import {
   deserialize,
+  SavedTranscription,
   serialize,
   SerializeableTranscription,
   TranscriptionID
@@ -33,5 +34,22 @@ export default function TranscriptionPage({
   initialTranscription
 }: TranscriptionPageProps) {
   const transcription = useTranscription(deserialize(initialTranscription))
-  return <Spinner />
+  if (transcription.isLoading) return <Spinner />
+  return transcription.data && transcription.data.status === 200 ? (
+    <TranscriptionDetail transcription={transcription.data.data} />
+  ) : (
+    <b className="text-red-500">An error occurred.</b>
+  )
+}
+
+type TranscriptionDetailProps = {
+  transcription: SavedTranscription
+}
+
+function TranscriptionDetail({ transcription }: TranscriptionDetailProps) {
+  return (
+    <div>
+      <b className="text-2xl">{transcription.filename}</b>
+    </div>
+  )
 }

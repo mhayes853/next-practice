@@ -1,31 +1,15 @@
 import { useTranscriptionDeletion } from "@/lib/client/api"
 import { SavedTranscription } from "@/lib/transcription"
 import { Button } from "./Button"
-import { durationComponents } from "@/lib/utils"
 import Link from "next/link"
 import { TrashCan } from "./Icons"
 import { Modal } from "./Modal"
 import { useState } from "react"
 import { Spinner } from "./Spinner"
+import { transcriptionLabel } from "@/lib/client/transcription"
 
 export type TranscriptionCardProps = {
   transcription: SavedTranscription
-}
-
-const LANGUAGE_MAP: Record<string, string> = {
-  en: "English",
-  es: "Spanish",
-  fr: "French"
-}
-
-function label(transcription: SavedTranscription) {
-  const language = transcription.language
-    ? (LANGUAGE_MAP[transcription.language] ?? transcription.language)
-    : "Unknown"
-  const { minutes, seconds } = durationComponents(
-    transcription.audioDurationMillis
-  )
-  return `${language} (${minutes}:${seconds < 10 ? "0" : ""}${seconds})`
 }
 
 export function TranscriptionCard({ transcription }: TranscriptionCardProps) {
@@ -42,7 +26,9 @@ export function TranscriptionCard({ transcription }: TranscriptionCardProps) {
         >
           <b>{transcription.filename}</b>
         </Link>
-        <p className="text-sm opacity-75">{label(transcription)}</p>
+        <p className="text-sm opacity-75">
+          {transcriptionLabel(transcription)}
+        </p>
       </div>
       <Button
         kind="danger"
