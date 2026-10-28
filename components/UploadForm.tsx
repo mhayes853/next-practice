@@ -41,6 +41,7 @@ export function UploadForm() {
       <input
         type="file"
         ref={fileInputRef}
+        accept="audio/*"
         onChange={(e) => setFile(e.target.files?.[0])}
       />
       {upload.error && (

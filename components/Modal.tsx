@@ -7,7 +7,7 @@ import {
   useRef
 } from "react"
 import { Unsubscribe } from "@/lib/utils"
-import { CloseButton } from "./CloseButton"
+import { CloseButton } from "./Button"
 
 export type ModalSubscribe = (isOpen: boolean) => void
 
@@ -19,8 +19,12 @@ export type ModalValues = {
 
 const ModalContext = createContext<ModalValues | undefined>(undefined)
 
+export function useModalIfAvailable() {
+  return useContext(ModalContext)
+}
+
 export function useModal() {
-  const context = useContext(ModalContext)
+  const context = useModalIfAvailable()
   if (!context) throw new Error("useModal must be used within a Modal")
   return context
 }

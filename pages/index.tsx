@@ -1,4 +1,5 @@
 import { Button } from "@/components/Button"
+import { Plus } from "@/components/Icons"
 import { Modal } from "@/components/Modal"
 import { TranscriptionCard } from "@/components/TranscriptionCard"
 import { UploadForm } from "@/components/UploadForm"
@@ -48,9 +49,11 @@ export default function Home({ session, initialPage }: HomeProps) {
       <b className="text-3xl">Welcome, {session.user.name}</b>
       <div className="flex flex-row gap-4 items-center mt-4">
         <Button onClick={() => setIsPresentingUpload(true)}>
-          + New Transcription
+          <div className="flex flex-row gap-2 items-center">
+            <Plus /> New Transcription
+          </div>
         </Button>
-        <Button kind="secondary" onClick={() => signOut()}>
+        <Button kind="danger" onClick={() => signOut()}>
           Sign Out
         </Button>
       </div>
