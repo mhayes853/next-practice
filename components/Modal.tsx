@@ -6,8 +6,8 @@ import {
   useEffect,
   useRef
 } from "react"
-import { Button } from "./Button"
 import { Unsubscribe } from "@/lib/utils"
+import { CloseButton } from "./CloseButton"
 
 export type ModalSubscribe = (isOpen: boolean) => void
 
@@ -65,9 +65,7 @@ export function Modal({ isOpen, onClose, children }: ModalProps) {
       >
         <div className="flex flex-col">
           <div className="flex justify-end">
-            <Button kind="secondary" onClick={onClose}>
-              X
-            </Button>
+            <CloseButton onClick={onClose} />
           </div>
           <ModalContext.Provider value={{ isOpen, close: onClose, subscribe }}>
             {children}
