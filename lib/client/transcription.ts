@@ -26,6 +26,7 @@ export function searchSegments(
   query: string
 ): SearchedTranscriptionSegment[] {
   return compactMap(segments, (segment) => {
+    if (query.length === 0) return { ...segment, highlightRegions: [] }
     const highlightRegions = occurences(
       segment.content.toLowerCase(),
       query.toLowerCase()

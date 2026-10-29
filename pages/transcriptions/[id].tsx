@@ -3,7 +3,7 @@ import { Spinner } from "@/components/Spinner"
 import { TranscriptionMenu } from "@/components/TranscriptionMenu"
 import { TranscriptionSegmentRow } from "@/components/TranscriptionSegmentRow"
 import { useTranscription } from "@/lib/client/api"
-import { transcriptionLabel } from "@/lib/client/transcription"
+import { searchSegments, transcriptionLabel } from "@/lib/client/transcription"
 import { useLastDefinedValue } from "@/lib/client/use-last-defined-value"
 import { authenticatedGetServerSideProps } from "@/lib/server/auth"
 import { transcriptionWithId } from "@/lib/server/transcription"
@@ -11,10 +11,12 @@ import {
   deserialize,
   SavedTranscription,
   serialize,
-  SerializeableTranscription
+  SerializeableTranscription,
+  TranscriptionSegment
 } from "@/lib/transcription"
 import { db } from "@/prisma/db"
 import { useRouter } from "next/router"
+import { useState } from "react"
 import { z } from "zod"
 
 const QuerySchema = z.object({
@@ -72,18 +74,37 @@ function TranscriptionDetail({ transcription }: TranscriptionDetailProps) {
       </div>
       <Divider />
 
-      <div className="flex flex-col gap-4">
-        <b className="text-xl">Segments</b>
-        {transcription.segments.length > 0 ? (
-          <div className="flex flex-col gap-2">
-            {transcription.segments.map((segment) => (
-              <TranscriptionSegmentRow key={segment.id} segment={segment} />
-            ))}
-          </div>
-        ) : (
-          <p>No segments for this audio.</p>
-        )}
-      </div>
+      <SegmentsList segments={transcription.segments} />
+    </div>
+  )
+}
+
+type SegmentsListProps = {
+  segments: TranscriptionSegment[]
+}
+
+function SegmentsList({ segments }: SegmentsListProps) {
+  const [query, setQuery] = useState("")
+  const searchedSegments = searchSegments(segments, query)
+  return (
+    <div className="flex flex-col gap-4">
+      <b className="text-xl">Segments</b>
+      <input
+        type="text"
+        placeholder="Search..."
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        className="mb-4 bg-[#23272e] p-4 rounded-xl"
+      />
+      {searchedSegments.length > 0 ? (
+        <div className="flex flex-col gap-2">
+          {searchedSegments.map((segment) => (
+            <TranscriptionSegmentRow key={segment.id} segment={segment} />
+          ))}
+        </div>
+      ) : (
+        <p>No segments for this audio.</p>
+      )}
     </div>
   )
 }

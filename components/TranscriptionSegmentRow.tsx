@@ -1,8 +1,20 @@
+import { SearchedTranscriptionSegment } from "@/lib/client/transcription"
 import { formattedDuration } from "@/lib/duration-components"
-import { TranscriptionSegment } from "@/lib/transcription"
 
 export type TranscriptionSegmentProps = {
-  segment: TranscriptionSegment
+  segment: SearchedTranscriptionSegment
+}
+
+function highlightContent(
+  content: string,
+  highlightRegions: { start: number; end: number }[]
+): string {
+  return highlightRegions.reduce((acc, { start, end }) => {
+    return acc.replace(
+      content.slice(start, end),
+      `<mark>${content.slice(start, end)}</mark>`
+    )
+  }, content)
 }
 
 export function TranscriptionSegmentRow({
@@ -14,7 +26,11 @@ export function TranscriptionSegmentRow({
         {formattedDuration(segment.timestamp)} -{" "}
         {formattedDuration(segment.timestamp + segment.durationMillis)}
       </b>
-      <p>{segment.content}</p>
+      <div
+        dangerouslySetInnerHTML={{
+          __html: highlightContent(segment.content, segment.highlightRegions)
+        }}
+      />
     </div>
   )
 }
