@@ -17,7 +17,7 @@ import {
 import { db } from "@/prisma/db"
 import { Session } from "next-auth"
 import { signOut } from "next-auth/react"
-import { useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 export type HomeProps = {
   session: Session
@@ -63,6 +63,23 @@ export default function Home({ session, initialPage }: HomeProps) {
     : undefined
   const transcriptions = useUserTranscriptions(deserializedInitialPage)
   const [isPresentingUpload, setIsPresentingUpload] = useState(false)
+  const observer = useRef<IntersectionObserver | undefined>(undefined)
+
+  const bottomRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (!node) return
+      if (observer.current) observer.current.disconnect()
+
+      observer.current = new IntersectionObserver((entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) transcriptions.setSize((s) => s + 1)
+        })
+      })
+
+      if (node) observer.current.observe(node)
+    },
+    [transcriptions]
+  )
 
   const hasTranscriptions =
     transcriptions.data &&
@@ -97,6 +114,11 @@ export default function Home({ session, initialPage }: HomeProps) {
         ) : (
           <p>No transcriptions yet.</p>
         )}
+        {hasNextPage(transcriptions) && (
+          <div ref={bottomRef}>
+            <Spinner />
+          </div>
+        )}
       </div>
       <Modal
         isOpen={isPresentingUpload}
@@ -106,4 +128,13 @@ export default function Home({ session, initialPage }: HomeProps) {
       </Modal>
     </div>
   )
+}
+
+function hasNextPage(
+  transcriptions: ReturnType<typeof useUserTranscriptions>
+): boolean {
+  if (transcriptions.error) return false
+  if (!transcriptions.data || transcriptions.data.length === 0) return true
+  const last = transcriptions.data[transcriptions.data.length - 1]
+  return last.status === 200 && last.data.nextCursor !== null
 }
