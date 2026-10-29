@@ -43,9 +43,10 @@ export default function TranscriptionPage({
       ? transcription.data.data
       : undefined
   )
-  if (transcription.isLoading) return <Spinner />
   return transcriptionDetail ? (
     <TranscriptionDetail transcription={transcriptionDetail} />
+  ) : transcription.isLoading ? (
+    <Spinner />
   ) : (
     <b className="text-red-500">An error occurred.</b>
   )
