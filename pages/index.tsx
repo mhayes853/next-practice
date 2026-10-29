@@ -17,7 +17,7 @@ import {
 import { db } from "@/prisma/db"
 import { Session } from "next-auth"
 import { signOut } from "next-auth/react"
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 
 export type HomeProps = {
   session: Session
