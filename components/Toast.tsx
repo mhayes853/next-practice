@@ -70,14 +70,15 @@ export function ToastProvider({ children }: ToastProviderProps) {
       value={useMemo(() => ({ present: toasts.present }), [toasts.present])}
     >
       {children}
-      {createPortal(
-        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex flex-col items-center gap-2 p-10">
-          {toasts.toasts.map((toast) => (
-            <Toast key={toast.id} toast={toast} onDismiss={toasts.dismiss} />
-          ))}
-        </div>,
-        document.body
-      )}
+      {toasts.toasts.length > 0 &&
+        createPortal(
+          <div className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex flex-col items-center gap-2 p-10">
+            {toasts.toasts.map((toast) => (
+              <Toast key={toast.id} toast={toast} onDismiss={toasts.dismiss} />
+            ))}
+          </div>,
+          document.body
+        )}
     </ToastContext.Provider>
   )
 }
@@ -100,7 +101,7 @@ function Toast({ toast, onDismiss }: ToastProps) {
       className={`pointer-events-auto rounded-xl ${TOAST_BACKGROUNDS[toast.type]}`}
     >
       <div className="flex items-center gap-2 py-2 pl-4 pr-1">
-        <p className="min-w-0 flex-1">{toast.message}</p>
+        <b className="min-w-0 flex-1">{toast.message}</b>
         <CloseButton className="shrink-0" onClick={() => onDismiss(toast.id)} />
       </div>
     </div>

@@ -70,13 +70,9 @@ export function LabelButton({
       aria-label={ariaLabel}
       className={`
         ${className ?? ""} flex ${fill ? "w-full" : ""} items-center justify-center
-        rounded-md text-zinc-500 transition cursor-pointer
+        rounded-md transition cursor-pointer
         active:scale-90 focus-visible:outline-none
-        ${
-          disabled
-            ? "opacity-50 cursor-not-allowed"
-            : "hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-100 dark:focus-visible:ring-offset-zinc-900"
-        }`}
+        ${disabled ? "opacity-50 cursor-not-allowed" : "dark:hover:bg-zinc-800/50"}`}
       onClick={onClick}
       disabled={disabled}
     >

@@ -4,9 +4,10 @@ import { LabelButton } from "./Button"
 export type TooltipProps = {
   menu: ReactNode
   children: ReactNode
+  labelClassName?: string
 }
 
-export function Tooltip({ menu, children }: TooltipProps) {
+export function Tooltip({ menu, children, labelClassName }: TooltipProps) {
   const [isPresented, setIsPresented] = useState(false)
 
   const closeTimer = useRef<NodeJS.Timeout | null>(null)
@@ -32,18 +33,21 @@ export function Tooltip({ menu, children }: TooltipProps) {
         }}
         onMouseLeave={scheduleClose}
       >
-        <LabelButton onClick={() => setIsPresented(true)}>
+        <LabelButton
+          onClick={() => setIsPresented(true)}
+          className={labelClassName}
+        >
           {children}
         </LabelButton>
       </div>
       {isPresented && (
         <div
-          className="
+          className={`
           absolute left-[-20] top-full z-50 mt-2
           whitespace-nowrap rounded-md bg-[#2b2e33] px-2 py-1 text-xs text-white shadow-lg
           opacity-0 translate-y-1 transition
           group-hover:opacity-100 group-hover:translate-y-0 ease-in-out
-          "
+          `}
           onClick={() => setIsPresented(false)}
           onMouseEnter={cancelClose}
           onMouseLeave={scheduleClose}

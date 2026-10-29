@@ -48,7 +48,7 @@ function transcription(
     userId: 1,
     filename,
     model: "whisper1",
-    segments: [{ content: "Hello", timestamp: 0, durationMillis: 1000 }],
+    segments: [{ id: 0, content: "Hello", timestamp: 0, durationMillis: 1000 }],
     language: "en",
     audioDurationMillis: 1000,
     createdAt: new Date("2026-10-01T12:00:00.000Z"),

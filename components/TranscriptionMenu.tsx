@@ -42,6 +42,7 @@ export function TranscriptionMenu({
               </div>
             </LabelButton>
           }
+          labelClassName="text-zinc-500"
         >
           <Ellipsis />
         </Tooltip>

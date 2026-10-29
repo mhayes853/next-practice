@@ -76,8 +76,8 @@ function TranscriptionDetail({ transcription }: TranscriptionDetailProps) {
         <b className="text-xl">Segments</b>
         {transcription.segments.length > 0 ? (
           <div className="flex flex-col gap-2">
-            {transcription.segments.map((segment, i) => (
-              <TranscriptionSegmentRow key={i} segment={segment} />
+            {transcription.segments.map((segment) => (
+              <TranscriptionSegmentRow key={segment.id} segment={segment} />
             ))}
           </div>
         ) : (

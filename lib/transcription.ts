@@ -23,7 +23,13 @@ export const TranscriptionIDSchema: z.ZodType<TranscriptionID> = z.number()
 
 export type TranscriptionID = number
 
+export const TranscriptionSegmentIDSchema: z.ZodType<TranscriptionSegmentID> =
+  z.number()
+
+export type TranscriptionSegmentID = number
+
 export const TranscriptionSegmentSchema = z.object({
+  id: TranscriptionSegmentIDSchema,
   content: z.string(),
   timestamp: z.number(),
   durationMillis: z.number()
@@ -34,7 +40,7 @@ export type TranscriptionSegment = z.infer<typeof TranscriptionSegmentSchema>
 export const TranscriptionSchema = z.object({
   filename: z.string(),
   model: TranscriptionModelIDSchema,
-  segments: z.array(TranscriptionSegmentSchema),
+  segments: z.array(TranscriptionSegmentSchema.omit({ id: true })),
   language: z.string().nullable(),
   audioDurationMillis: z.number()
 })
@@ -44,6 +50,7 @@ export type Transcription = z.infer<typeof TranscriptionSchema>
 export const SavedTranscriptionSchema = TranscriptionSchema.extend({
   id: TranscriptionIDSchema,
   userId: UserIDSchema,
+  segments: z.array(TranscriptionSegmentSchema),
   createdAt: z.iso.datetime().pipe(z.coerce.date()),
   updatedAt: z.iso.datetime().pipe(z.coerce.date())
 })
