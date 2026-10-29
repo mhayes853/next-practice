@@ -7,6 +7,8 @@ import {
   useRef,
   useState
 } from "react"
+import { createPortal } from "react-dom"
+import { CloseButton } from "./Button"
 
 export const DEFAULT_TOAST_DURATION = 3000
 
@@ -68,6 +70,39 @@ export function ToastProvider({ children }: ToastProviderProps) {
       value={useMemo(() => ({ present: toasts.present }), [toasts.present])}
     >
       {children}
+      {createPortal(
+        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex flex-col items-center gap-2 p-10">
+          {toasts.toasts.map((toast) => (
+            <Toast key={toast.id} toast={toast} onDismiss={toasts.dismiss} />
+          ))}
+        </div>,
+        document.body
+      )}
     </ToastContext.Provider>
+  )
+}
+
+type ToastProps = {
+  toast: PresentedToast
+  onDismiss: (id: number) => void
+}
+
+const TOAST_BACKGROUNDS = {
+  success: "bg-green-500",
+  error: "bg-red-500",
+  info: "bg-blue-500",
+  warning: "bg-yellow-500"
+} as const
+
+function Toast({ toast, onDismiss }: ToastProps) {
+  return (
+    <div
+      className={`pointer-events-auto rounded-xl ${TOAST_BACKGROUNDS[toast.type]}`}
+    >
+      <div className="flex items-center gap-2 py-2 pl-4 pr-1">
+        <p className="min-w-0 flex-1">{toast.message}</p>
+        <CloseButton className="shrink-0" onClick={() => onDismiss(toast.id)} />
+      </div>
+    </div>
   )
 }

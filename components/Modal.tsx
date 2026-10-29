@@ -71,7 +71,7 @@ export function Modal({ isOpen, onClose, children }: ModalProps) {
           <div className="flex flex-row">
             <div className="flex-1"></div>
             <div>
-              <CloseButton onClick={onClose} />
+              <CloseButton fill onClick={onClose} />
             </div>
           </div>
           <div className="flex flex-col gap-4">

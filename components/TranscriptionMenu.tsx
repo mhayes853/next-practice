@@ -6,6 +6,7 @@ import { TrashCan, Ellipsis } from "./Icons"
 import { Tooltip } from "./Tooltip"
 import { useState } from "react"
 import { Modal } from "./Modal"
+import { useToastPresenter } from "./Toast"
 
 export type TranscriptionMenuProps = {
   id: TranscriptionID
@@ -17,7 +18,16 @@ export function TranscriptionMenu({
   onDeleteSuccess
 }: TranscriptionMenuProps) {
   const [isShowingConfirmation, setIsShowingConfirmation] = useState(false)
-  const deletion = useTranscriptionDeletion(id, { onSuccess: onDeleteSuccess })
+  const presenter = useToastPresenter()
+  const deletion = useTranscriptionDeletion(id, {
+    onSuccess: () => {
+      onDeleteSuccess?.()
+      presenter.present({
+        message: "Transcription deleted successfully",
+        type: "info"
+      })
+    }
+  })
   return (
     <>
       {deletion.isMutating ? (

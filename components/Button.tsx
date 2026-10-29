@@ -53,6 +53,7 @@ export type LabelButtonProps = {
   onClick?: () => void
   children: ReactNode
   className?: string
+  fill?: boolean
   ariaLabel?: string
 }
 
@@ -61,13 +62,14 @@ export function LabelButton({
   children,
   disabled,
   className,
+  fill,
   ariaLabel
 }: LabelButtonProps) {
   return (
     <button
       aria-label={ariaLabel}
       className={`
-        ${className ?? ""} flex w-full items-center justify-center
+        ${className ?? ""} flex ${fill ? "w-full" : ""} items-center justify-center
         rounded-md text-zinc-500 transition cursor-pointer
         active:scale-90 focus-visible:outline-none
         ${
@@ -85,12 +87,18 @@ export function LabelButton({
 
 export type CloseButtonProps = {
   onClick?: () => void
+  fill?: boolean
   className?: string
 }
 
-export function CloseButton({ onClick, className }: CloseButtonProps) {
+export function CloseButton({ onClick, fill, className }: CloseButtonProps) {
   return (
-    <LabelButton onClick={onClick} className={className} ariaLabel="Close">
+    <LabelButton
+      onClick={onClick}
+      fill={fill}
+      className={className}
+      ariaLabel="Close"
+    >
       <div className="shrink-0 transition-transform duration-200 group-hover:rotate-90">
         <XMark />
       </div>
