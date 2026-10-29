@@ -42,4 +42,13 @@ describe("transcriptionLabel", () => {
     const result = searchSegments(segments, "blob")
     expect(result).toHaveLength(0)
   })
+
+  it("searches for an empty query", () => {
+    const segments = [
+      { id: 0, content: "Hello world", timestamp: 0, durationMillis: 1000 },
+      { id: 1, content: "Goodbye world", timestamp: 10, durationMillis: 1000 }
+    ]
+    const result = searchSegments(segments, "")
+    expect(result).toHaveLength(2)
+  })
 })
