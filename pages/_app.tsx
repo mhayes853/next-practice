@@ -1,3 +1,4 @@
+import { ToastProvider } from "@/components/Toast"
 import "@/styles/globals.css"
 import { SessionProvider } from "next-auth/react"
 import type { AppProps } from "next/app"
@@ -8,9 +9,11 @@ const geist = Geist()
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <SessionProvider session={pageProps.session}>
-      <div className={geist.className}>
-        <Component {...pageProps} />
-      </div>
+      <ToastProvider>
+        <div className={geist.className}>
+          <Component {...pageProps} />
+        </div>
+      </ToastProvider>
     </SessionProvider>
   )
 }
