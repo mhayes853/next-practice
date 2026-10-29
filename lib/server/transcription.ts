@@ -95,7 +95,7 @@ export async function userTranscriptions(
     )
       .where({ userId })
       .where((t) => t.id.gte(decodedCursor?.id ?? -1))
-      .orderBy((t) => t.id.asc())
+      .orderBy((t) => t.id.desc())
       .limit(limit + 1)
       .all()
   ).map(savedTranscription)
