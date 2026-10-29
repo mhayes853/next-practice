@@ -12,7 +12,7 @@ export default defineConfig({
         test: {
           name: 'client',
           environment: 'jsdom',
-          include: ['lib/client/**/*.test.{ts,tsx}'],
+          include: ['lib/client/**/*.test.{ts,tsx}', 'components/**/*.test.{ts,tsx}'],
         },
       },
       {
@@ -20,7 +20,7 @@ export default defineConfig({
         test: {
           name: 'default',
           environment: 'jsdom',
-          exclude: [...configDefaults.exclude, 'lib/client/**'],
+          exclude: [...configDefaults.exclude, 'lib/client/**', 'components/**'],
           setupFiles: ['./test/setup.ts'],
         },
       },
