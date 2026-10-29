@@ -89,12 +89,14 @@ export async function userTranscriptions(
 ): Promise<TranscriptionsPage | "invalid-cursor"> {
   const decodedCursor = cursor ? decodeCursor(cursor) : null
   if (decodedCursor === undefined) return "invalid-cursor"
+  let query = db.orm.public.Transcript.include("parts", (p) =>
+    p.orderBy((p) => p.id.asc())
+  ).where({ userId })
+  if (decodedCursor) {
+    query = query.where((t) => t.id.lte(decodedCursor.id))
+  }
   const transcriptions = (
-    await db.orm.public.Transcript.include("parts", (p) =>
-      p.orderBy((p) => p.id.asc())
-    )
-      .where({ userId })
-      .where((t) => t.id.gte(decodedCursor?.id ?? -1))
+    await query
       .orderBy((t) => t.id.desc())
       .limit(limit + 1)
       .all()

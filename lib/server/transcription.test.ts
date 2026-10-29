@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { Transcription, TranscriptionsPage } from "../transcription"
+import { encodeCursor, Transcription, TranscriptionsPage } from "../transcription"
 import {
   deleteTranscriptionById,
   saveTranscription,
@@ -39,27 +39,27 @@ describe("transcription tests", () => {
     expect(parts).toMatchObject(TEST_TRANSCRIPTION.segments)
   })
 
-  it("should return user transcripts", async () => {
+  it.each([1, 2, 3, 4])("returns user transcripts newest first with a page size of %i", async (limit) => {
     const user = await testUser()
     const t1 = await saveTranscription(db, user.id, TEST_TRANSCRIPTION)
     const t2 = await saveTranscription(db, user.id, TEST_TRANSCRIPTION)
+    const t3 = await saveTranscription(db, user.id, TEST_TRANSCRIPTION)
+    const expected = [t3, t2, t1]
+    let cursor: string | null = null
 
-    const p1 = (await userTranscriptions(
-      db,
-      user.id,
-      1,
-      null
-    )) as TranscriptionsPage
-    const p2 = (await userTranscriptions(
-      db,
-      user.id,
-      1,
-      p1.nextCursor
-    )) as TranscriptionsPage
+    for (let offset = 0; offset < expected.length; offset += limit) {
+      const page = (await userTranscriptions(
+        db,
+        user.id,
+        limit,
+        cursor
+      )) as TranscriptionsPage
+      const next = expected[offset + limit]
 
-    expect(p1.transcriptions).toEqual([t1])
-    expect(p2.transcriptions).toEqual([t2])
-    expect(p2.nextCursor).toBeNull()
+      expect(page.transcriptions).toEqual(expected.slice(offset, offset + limit))
+      expect(page.nextCursor).toBe(next ? encodeCursor({ id: next.id }) : null)
+      cursor = page.nextCursor
+    }
   })
 
   it("should return an invalid cursor when the cursor is invalid", async () => {

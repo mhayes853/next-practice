@@ -83,7 +83,7 @@ describe("/api/transcript", () => {
     expect(partiallyNumeric.status).toBe(400)
   })
 
-  it("lists the signed-in user's transcripts with a cursor", async () => {
+  it("lists only the signed-in user's transcripts newest first across cursor pages", async () => {
     const first = await saveTranscription(db, ownerId, {
       ...TEST_TRANSCRIPTION,
       filename: "first.wav"
@@ -110,13 +110,28 @@ describe("/api/transcript", () => {
     expect(response.status).toBe(200)
     expect(page.transcriptions).toHaveLength(1)
     expect(page.transcriptions[0]).toMatchObject({
+      id: second.id,
+      filename: "second.wav",
+      userId: ownerId
+    })
+    expect(page.nextCursor).toBe(
+      Buffer.from(String(first.id)).toString("base64url")
+    )
+
+    const nextResponse = await callApiRoute(pagesHandler, {
+      method: "GET",
+      path: `/api/transcript?limit=1&cursor=${encodeURIComponent(page.nextCursor)}`
+    })
+    const nextPage = JSON.parse(nextResponse.body)
+
+    expect(nextResponse.status).toBe(200)
+    expect(nextPage.transcriptions).toHaveLength(1)
+    expect(nextPage.transcriptions[0]).toMatchObject({
       id: first.id,
       filename: "first.wav",
       userId: ownerId
     })
-    expect(page.nextCursor).toBe(
-      Buffer.from(String(second.id)).toString("base64url")
-    )
+    expect(nextPage.nextCursor).toBeNull()
   })
 
   it("accepts multipart uploads, mocks transcription, and persists the result", async () => {
