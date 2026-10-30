@@ -3,6 +3,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useRef,
   useState
@@ -40,6 +41,15 @@ export function useToasts() {
   const currentId = useRef(0)
   const toastTimeout = useRef<Map<number, NodeJS.Timeout>>(new Map())
   const [toasts, setToasts] = useState<PresentedToast[]>([])
+
+  useEffect(() => {
+    const timeouts = toastTimeout.current
+    return () => {
+      timeouts.values().forEach(clearTimeout)
+      timeouts.clear()
+    }
+  }, [])
+
   return {
     toasts,
     dismiss: useCallback((id: number) => {
