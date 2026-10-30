@@ -63,7 +63,9 @@ describe("useStoredValue", () => {
   })
 
   it("passes null to an updater when the key is absent", () => {
-    const { result } = renderHook(() => useStoredValue("model", "fallback"))
+    const { result } = renderHook(() =>
+      useStoredValue<string>("model", "fallback")
+    )
 
     act(() => result.current[1]((previous) => previous ?? "whisper1"))
 
@@ -177,7 +179,10 @@ describe("useStoredValue", () => {
     act(() => {
       window.localStorage.clear()
       window.dispatchEvent(
-        new StorageEvent("storage", { key: null, storageArea: window.localStorage })
+        new StorageEvent("storage", {
+          key: null,
+          storageArea: window.localStorage
+        })
       )
     })
 

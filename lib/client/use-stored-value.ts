@@ -2,21 +2,21 @@ import { useCallback, useSyncExternalStore } from "react"
 
 const LOCAL_STORAGE_CHANGE_EVENT = "local-storage-change"
 
-export function useStoredValue(
+export function useStoredValue<T extends string>(
   key: string,
-  initialValue: string | null
-): [string | null, React.Dispatch<React.SetStateAction<string | null>>] {
+  initialValue: T | null
+): [T | null, React.Dispatch<React.SetStateAction<T | null>>] {
   const value = useSyncExternalStore(
     subscribe,
     () => window.localStorage.getItem(key),
     () => initialValue
   )
   return [
-    value,
+    value as T,
     useCallback(
       (newValue) => {
         if (typeof newValue === "function") {
-          store(key, newValue(window.localStorage.getItem(key)))
+          store(key, newValue(window.localStorage.getItem(key) as T))
         } else {
           store(key, newValue)
         }

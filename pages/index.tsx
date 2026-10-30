@@ -5,6 +5,7 @@ import { Spinner } from "@/components/Spinner"
 import { TranscriptionCard } from "@/components/TranscriptionCard"
 import { UploadForm } from "@/components/UploadForm"
 import { useUserTranscriptions } from "@/lib/client/api"
+import { useStoredValue } from "@/lib/client/use-stored-value"
 import { authenticatedGetServerSideProps } from "@/lib/server/auth"
 import { userTranscriptions } from "@/lib/server/transcription"
 import {
@@ -54,6 +55,10 @@ export const getServerSideProps = authenticatedGetServerSideProps(
   }
 )
 
+type TranscriptionsLayout = "grid" | "list"
+
+const TRANSCRIPTIONS_LAYOUT_KEY = "transcriptions-layout"
+
 export default function Home({ session, initialPage }: HomeProps) {
   const deserializedInitialPage = initialPage
     ? {
@@ -64,6 +69,10 @@ export default function Home({ session, initialPage }: HomeProps) {
   const transcriptions = useUserTranscriptions(deserializedInitialPage)
   const [isPresentingUpload, setIsPresentingUpload] = useState(false)
   const observer = useRef<IntersectionObserver | undefined>(undefined)
+  const [layout, setLayout] = useStoredValue<TranscriptionsLayout>(
+    TRANSCRIPTIONS_LAYOUT_KEY,
+    "grid"
+  )
 
   const bottomRef = useCallback(
     (node: HTMLDivElement | null) => {
@@ -100,20 +109,40 @@ export default function Home({ session, initialPage }: HomeProps) {
         </Button>
       </div>
       <div className="flex flex-col gap-4 pt-16">
-        <b className={`text-xl ${hasTranscriptions ? "pl-4" : ""}`}>
-          Transcriptions
-        </b>
+        <div className="flex flex-row justify-between items-center">
+          <b className={`text-xl ${hasTranscriptions ? "pl-4" : ""}`}>
+            Transcriptions
+          </b>
+          <div className="flex flex-row gap-4">
+            <p
+              className={`cursor-pointer ${layout === "grid" ? "font-bold" : ""}`}
+              onClick={() => setLayout("grid")}
+            >
+              Grid
+            </p>
+            <p
+              className={`cursor-pointer ${layout === "list" ? "font-bold" : ""}`}
+              onClick={() => setLayout("list")}
+            >
+              List
+            </p>
+          </div>
+        </div>
         {transcriptions.isLoading && <Spinner />}
-        {hasTranscriptions ? (
-          transcriptions.data?.map((page) => {
-            if (page.status !== 200) return null
-            return page.data.transcriptions.map((t) => (
-              <TranscriptionCard key={t.id} transcription={t} />
-            ))
-          })
-        ) : (
-          <p>No transcriptions yet.</p>
-        )}
+        <div
+          className={`${layout === "grid" ? "grid grid-cols-2 gap-4" : "flex flex-col"} gap-4`}
+        >
+          {hasTranscriptions ? (
+            transcriptions.data?.map((page) => {
+              if (page.status !== 200) return null
+              return page.data.transcriptions.map((t) => (
+                <TranscriptionCard key={t.id} transcription={t} />
+              ))
+            })
+          ) : (
+            <p>No transcriptions yet.</p>
+          )}
+        </div>
         {hasNextPage(transcriptions) && (
           <div ref={bottomRef}>
             <Spinner />
