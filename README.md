@@ -18,4 +18,16 @@ While your agent can easily write Next, React, and Tailwind, interviews typicall
 
 This project is mostly handwritten, with some agentic use for writing test cases. It handles authentication, common UI components like toasts and modals, uses tailwind, uses Prisma, uses SWR, and does transcription via the Vercel AI SDK.
 
-You can run the app locally through standard npm/bun commands.
+## Running
+
+You can run the app locally through:
+
+```sh
+bun dev
+```
+
+Tests can be ran via:
+
+```sh
+bun test
+```
